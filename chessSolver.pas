@@ -7,6 +7,15 @@ const n        = 8;
       ladya    = 4;
       ferz     = 5;
       korol    = 6;
+      bpeshka   = -peshka;
+      bloshad   = -loshad;
+      bofficer  = -officer;
+      bladya    = -ladya;
+      bferz     = -ferz;
+      bkorol    = -korol;
+      white    =  1;
+      black    = -1;
+
 
 var field: array [1..n, 1..n] of integer;
 
@@ -128,22 +137,82 @@ begin
   showField;
 end;
 //Reshenie
-function isWhiteSafe:boolean;
-var i,j, i0, j0: integer;
-    res: boolean;
+function getFigureOn(i,j: integer): integer;
 begin
-  findKorol(1,i0,j0);
-  //Peshki
-  //loshad
-  //officer
-  //ladya
-  //ferz
-
-end; // End of isWhiteSafe
-
-function isBlackSafe:boolean;
+  if (i>=1) and (i<=n) and (j>=1) and (j<=n) then
+  begin
+    getFigureOn := field[i,j];
+  end else
+  begin
+    getFigureOn := 0;
+  end;
+end;
+function isUnderAttackByFigure(figure, i0, j0: integer): boolean;
+var res: boolean;
+    i,j: integer;
 begin
+  res := false;
+  if (abs(figure) = peshka) then
+  begin
+    if (figure > 0) then
+    begin
 
+    end else
+    begin
+
+    end;
+  end else
+  if (abs(figure) = loshad) then
+  begin
+
+  end else
+  if (abs(figure) = officer) then
+  begin
+
+  end else
+  if (abs(figure) = ladya) then
+  begin
+
+  end else
+  if (abs(figure) = officer) then
+  begin
+
+  end else
+  if (abs(figure) = korol) then
+  begin
+
+  end;
+
+  isUnderAttackByFigure := res;
+
+
+end;
+
+function isUnderAttackBy(colorOfattacker, i0, j0: integer): boolean;
+var res: boolean;
+begin
+   res := isUnderAttackByFigure(peshka * colorOfattacker, i0, j0);
+   if (not res) then
+   begin
+     res := isUnderAttackByFigure(loshad * colorOfattacker, i0, j0);
+     if (not res) then
+     begin
+       res := isUnderAttackByFigure(officer * colorOfattacker, i0, j0);
+       if (not res) then
+       begin
+         res := isUnderAttackByFigure(ladya * colorOfattacker, i0, j0);
+         if (not res) then
+         begin
+           res := isUnderAttackByFigure(ferz * colorOfattacker, i0, j0);
+           if (not res) then
+           begin
+             res := isUnderAttackByFigure(korol * colorOfattacker, i0, j0);
+           end;
+         end;
+       end;
+     end;
+   end;
+   isUnderAttackBy := res;
 end;
 
 Begin
