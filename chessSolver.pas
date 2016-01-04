@@ -65,45 +65,7 @@ begin
   end;
 end;
 
-Procedure showField;
-var i,j: integer;
-begin
-  textbackground(7);
-  clrscr;
-  for i:=1 to n do
-  begin
-    for j:=1 to n do
-    begin
 
-      if ((i+j) mod 2 = 0) then textbackground(6)
-                            else textbackground(5);
-
-      if (field[i,j]>0) then textcolor(15)
-                        else textcolor(0);
-      gotoxy(1+9*j,1+6*i);
-      write(' ');
-      gotoxy(1+9*j,2+6*i);
-      write(' ');
-      gotoxy(1+9*j,3+6*i);
-      write(' ');
-      gotoxy(2+9*j,1+6*i);
-      write(' ');
-      gotoxy(2+9*j,3+6*i);
-      write(' ');
-      gotoxy(3+9*j,1+6*i);
-      write(' ');
-      gotoxy(3+9*j,2+6*i);
-      write(' ');
-      gotoxy(3+9*j,3+6*i);
-      write(' ');
-      gotoxy(2+9*j,2+6*i);
-      if (field[i,j]<>0) then write(abs(field[i,j]))
-                         else write(' ');
-
-    end;
-  end;
-
-end; // end showField
 
 
 procedure initialize;
@@ -134,7 +96,6 @@ begin
   end;
   close(f);
   clrscr;
-  showField;
 end;
 //Reshenie
 function getFigureOn(i,j: integer): integer;
@@ -147,6 +108,25 @@ begin
     getFigureOn := 0;
   end;
 end;
+function searchTo(i0,j0,dn,dm: integer): integer;
+var i,j: integer;
+    current: integer;
+begin
+	i := i0 + dn;
+	j := j0 + dm;
+
+	current := getFigureOn(i,j);
+	if (dn <> 0) or (dm <> 0) then
+	begin
+		while (current = 0) and (i<=n) and (i>=1) and (j<=n) and (j>=1) do
+		begin
+			i := i + dn;
+			j := j + dm;
+			current := getFigureOn(i,j);
+		end;
+	end;
+	searchTo := current;
+end;
 function isUnderAttackByFigure(figure, i0, j0: integer): boolean;
 var res: boolean;
     i,j: integer;
@@ -156,31 +136,116 @@ begin
   begin
     if (figure > 0) then
     begin
-
+    	if (getFigureOn(i0+1,j0+1) = figure) or (getFigureOn(i0+1,j0-1) = figure) then
+    	begin
+    		res := true;
+    	end;
     end else
     begin
-
+    	if (getFigureOn(i0-1,j0+1) = figure) or (getFigureOn(i0-1,j0-1) = figure) then
+    	begin
+    		res := true;
+    	end;
     end;
   end else
   if (abs(figure) = loshad) then
   begin
-
+  	if ((getFigureOn(i0-2,j0-1) = figure) or
+                (getFigureOn(i0-2,j0+1) = figure) or
+  		(getFigureOn(i0+2,j0-1) = figure) or
+  		(getFigureOn(i0+2,j0+1) = figure) or
+  		(getFigureOn(i0-1,j0-2) = figure) or
+  		(getFigureOn(i0-1,j0+2) = figure) or
+  		(getFigureOn(i0+1,j0-2) = figure) or
+  		(getFigureOn(i0+1,j0+2) = figure)) then
+  	begin
+  		res := true;
+  	end
   end else
   if (abs(figure) = officer) then
   begin
+  	if (searchTo(i0,j0,-1,-1) = figure) then
+  	begin
+  		//To The left top
+  		res := true;
+  	end
+  	else if (searchTo(i0,j0,-1,1) = figure) then
+  	begin
+  		//To The right Top
+  		res := true;
+  	end
+	else if (searchTo(i0,j0,1,-1) = figure) then
+  	begin
+  		//To the left bottom
+  		res := true;
+  	end
+  	else if (searchTo(i0,j0,1,1) = figure) then
+  	begin
+	  	//to the right bottom
+  		res := true;
+  	end;
 
   end else
   if (abs(figure) = ladya) then
   begin
+  	//Search
+  	if (searchTo(i0,j0,-1,0) = figure) then
+  	begin
+  		res := true;
+  	end else if (searchTo(i0,j0,1,0) = figure) then
+  	begin
+  		res := true;
+  	end else if (searchTo(i0,j0,0,-1) = figure) then
+  	begin
+  		res := true;
+  	end else if (searchTo(i0,j0,0,1) = figure) then
+  	begin
+  		res := true;
+  	end;
 
   end else
-  if (abs(figure) = officer) then
+  if (abs(figure) = ferz) then
   begin
-
+  	//Search
+  	if (searchTo(i0,j0,-1,-1) = figure) then
+  	begin
+  		res := true;
+  	end else if (searchTo(i0,j0,-1,0) = figure) then
+  	begin
+  		res := true;
+  	end else if (searchTo(i0,j0,-1,1) = figure) then
+  	begin
+  		res := true;
+  	end else if (searchTo(i0,j0,0,1) = figure) then
+  	begin
+  		res := true;
+  	end else if (searchTo(i0,j0,1,1) = figure) then
+  	begin
+  		res := true;
+  	end else if (searchTo(i0,j0,1,0) = figure) then
+  	begin
+  		res := true;
+  	end else if (searchTo(i0,j0,1,-1) = figure) then
+  	begin
+  		res := true;
+  	end else if (searchTo(i0,j0,0,-1) = figure) then
+  	begin
+  		res := true;
+  	end;
   end else
   if (abs(figure) = korol) then
   begin
-
+  	if ((getFigureOn(i0-1,j0-1) = figure) or
+  	    (getFigureOn(i0-1,j0) = figure) or
+  	    (getFigureOn(i0-1,j0+1) = figure) or
+  	    (getFigureOn(i0,j0-1) = figure) or
+  	    (getFigureOn(i0,j0+1) = figure) or
+  	    (getFigureOn(i0+1,j0-1) = figure) or
+  	    (getFigureOn(i0+1,j0) = figure) or
+  	    (getFigureOn(i0+1,j0+1) = figure)) then
+  	begin
+  		res := true;
+  	end
   end;
 
   isUnderAttackByFigure := res;
@@ -214,9 +279,50 @@ begin
    end;
    isUnderAttackBy := res;
 end;
+Procedure showField;
+var i,j: integer;
+begin
+   textbackground(7);
+  clrscr;
+  for i:=1 to n do
+  begin
+    for j:=1 to n do
+    begin
+
+      if ((i+j) mod 2 = 0) then textbackground(6)
+                            else textbackground(5);
+
+      if (isUnderAttackBy(white,i,j)) then textbackground(4);
+
+      if (field[i,j]>0) then textcolor(15)
+                        else textcolor(0);
+      gotoxy(1+9*j,1+6*i);
+      write(' ');
+      gotoxy(1+9*j,2+6*i);
+      write(' ');
+      gotoxy(1+9*j,3+6*i);
+      write(' ');
+      gotoxy(2+9*j,1+6*i);
+      write(' ');
+      gotoxy(2+9*j,3+6*i);
+      write(' ');
+      gotoxy(3+9*j,1+6*i);
+      write(' ');
+      gotoxy(3+9*j,2+6*i);
+      write(' ');
+      gotoxy(3+9*j,3+6*i);
+      write(' ');
+      gotoxy(2+9*j,2+6*i);
+      if (field[i,j]<>0) then write(abs(field[i,j]))
+                         else write(' ');
+
+    end;
+  end;
+
+end; // end showField
 
 Begin
   initialize;
-
+  showField;
   readkey;
 end.
