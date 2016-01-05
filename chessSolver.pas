@@ -23,10 +23,12 @@ const n        = 8;
 
 
 var field: array [1..n, 1..n] of integer;
-    moves: array [1..10000] of move;
+    moves: mas;
     countOfPossibleMoves: integer;
     isCheckToWhite, isCheckToBlack: boolean;
     z: integer;
+    MakedMoves: mas;
+    CountOfMakedMoves: integer =0;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -352,6 +354,41 @@ begin
   writeln(f);
   close(f);
 end;
+function figureTOSTR(f: integer): string;
+var res: string;
+begin
+  res:= ' ';
+  if (abs(f) = peshka) then res:= ' peshka';
+  if (abs(f) = loshad) then res:= ' loshad';
+  if (abs(f) = officer) then res:= ' officer';
+  if (abs(f) = ladya) then res:= ' ladya';
+  if (abs(f) = ferz) then res:= ' ferz';
+  if (abs(f) = korol) then res:= ' korol';
+  if (f<0) then res[1] := 'b'
+           else res[1] := 'w';
+  figuretoSTR:=res;
+
+end;
+
+procedure saveMoves;
+var i: integer;
+    f: text;
+begin
+  i:=1;
+  assign(f, 'moves.txt');
+  append(f);
+  for i:=1 to CountOfMakedMoves do
+  begin
+    with makedmoves[i] do
+    begin
+      writeln(f,figuretostr(figureStart),' ', iStart,' ', jStart,' ', iEnd,' ', jEnd);
+    end;
+  end;
+  writeln(f);
+  close(f);
+
+end;
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 function CreateMove(iStart, jStart, iEnd, jEnd, figureStart: integer): move;
@@ -374,6 +411,8 @@ begin
     figureEnd := field[iEnd, jEnd];
     field[iEnd, jEnd] := figureStart;
     field[iStart, jStart] := 0;
+    inc(countOfMakedMoves);
+    MakedMoves[countOfMakedMoves]:=m;
   end;
 end;
 //-----------------------------------------------------------------------------
@@ -384,6 +423,7 @@ begin
   begin
     field[iStart, jStart] := figureStart;
     field[iEnd, jEnd] := figureEnd;
+    dec(CountofMakedMoves);
   end;
 end;
 //-----------------------------------------------------------------------------
@@ -619,8 +659,9 @@ begin
           writeln;
           textbackground(3);
           Writeln('solved');
-          readkey;
-          saveField;
+//          readkey;
+//          saveField;
+          Savemoves;
       end else
       for i := LastPossibleMoveIndex downto FirstPossibleMoveIndex do
       begin
@@ -628,6 +669,7 @@ begin
         if (isLog) then showField;
         Solve(-color, countOfMoves -1);
         UndoMove(moves[i]);
+        moves[i] := CreateMove(0,0,0,0,0);
       end;
       countOfPossibleMoves := FirstPossibleMoveIndex - 1;
 
