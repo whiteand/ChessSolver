@@ -1,414 +1,528 @@
-wferz 8 3 8 1
-bferz 8 7 4 7
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bferz 8 7 5 7
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bferz 8 7 6 7
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bferz 8 7 7 8
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bferz 8 7 2 1
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bferz 8 7 5 4
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bferz 8 7 7 6
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bofficer 8 6 6 8
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bofficer 8 6 6 4
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bofficer 8 6 7 5
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 7 3 8 3
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bladya 5 6 7 6
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bladya 5 6 6 6
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bladya 5 6 5 8
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bladya 5 6 5 7
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wferz 8 1 8 4
-bladya 5 6 5 4
-wferz 8 4 5 4
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wferz 8 1 6 3
-bladya 5 6 5 4
-wferz 6 3 5 4
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bferz 8 7 4 7
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bferz 8 7 5 7
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bferz 8 7 6 7
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bferz 8 7 7 8
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bferz 8 7 7 6
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bofficer 8 6 6 8
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bofficer 8 6 6 4
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bofficer 8 6 7 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bpeshka 7 3 8 3
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bpeshka 6 5 7 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bloshad 6 3 7 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bloshad 6 3 7 1
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bloshad 6 3 8 4
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bloshad 6 3 8 2
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bladya 5 6 7 6
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bladya 5 6 6 6
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bladya 5 6 5 8
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bladya 5 6 5 7
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bpeshka 5 1 6 1
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bpeshka 3 7 4 7
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bloshad 1 7 3 8
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 5 6 5
-wladya 3 4 5 4
-bloshad 1 7 3 6
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bpeshka 5 1 6 1
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bkorol 4 5 5 5
-wladya 3 4 5 4
-bkorol 5 5 4 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bkorol 4 5 3 4
-wferz 8 1 8 4
-bkorol 3 4 2 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bkorol 4 5 3 4
-wpeshka 5 3 4 3
-bkorol 3 4 2 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bkorol 4 5 3 4
-wloshad 4 1 3 3
-bloshad 6 3 7 5
-wferz 8 1 4 5
-
-wferz 8 3 8 1
-bkorol 4 5 3 4
-wloshad 4 1 3 3
-bloshad 6 3 7 1
-wferz 8 1 4 5
-
-wferz 8 3 8 1
-bkorol 4 5 3 4
-wloshad 4 1 3 3
-bloshad 6 3 8 4
-wferz 8 1 4 5
-
-wferz 8 3 8 1
-bkorol 4 5 3 4
-wloshad 4 1 3 3
-bloshad 6 3 8 2
-wferz 8 1 4 5
-
-wferz 8 3 8 1
-bkorol 4 5 3 4
-wloshad 4 1 3 3
-bloshad 6 3 4 1
-wferz 8 1 4 5
-
-wferz 8 3 8 1
-bkorol 4 5 3 4
-wloshad 2 5 3 7
-bloshad 6 3 7 5
-wferz 8 1 4 5
-
-wferz 8 3 8 1
-bkorol 4 5 3 4
-wloshad 2 5 3 7
-bloshad 6 3 7 1
-wferz 8 1 4 5
-
-wferz 8 3 8 1
-bkorol 4 5 3 4
-wloshad 2 5 3 7
-bloshad 6 3 8 4
-wferz 8 1 4 5
-
-wferz 8 3 8 1
-bkorol 4 5 3 4
-wloshad 2 5 3 7
-bloshad 6 3 8 2
-wferz 8 1 4 5
-
-wferz 8 3 8 1
-bkorol 4 5 3 4
-wloshad 2 5 3 3
-bloshad 6 3 7 5
-wferz 8 1 4 5
-
-wferz 8 3 8 1
-bkorol 4 5 3 4
-wloshad 2 5 3 3
-bloshad 6 3 7 1
-wferz 8 1 4 5
-
-wferz 8 3 8 1
-bkorol 4 5 3 4
-wloshad 2 5 3 3
-bloshad 6 3 8 4
-wferz 8 1 4 5
-
-wferz 8 3 8 1
-bkorol 4 5 3 4
-wloshad 2 5 3 3
-bloshad 6 3 8 2
-wferz 8 1 4 5
-
-wferz 8 3 8 1
-bpeshka 3 7 4 7
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bloshad 1 7 3 8
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 1
-bloshad 1 7 3 6
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 2
-bferz 8 7 4 7
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 2
-bferz 8 7 5 7
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 2
-bferz 8 7 6 7
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 2
-bferz 8 7 7 8
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 2
-bferz 8 7 2 1
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 2
-bferz 8 7 5 4
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 2
-bferz 8 7 7 6
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 2
-bofficer 8 6 6 8
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 2
-bofficer 8 6 6 4
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
-
-wferz 8 3 8 2
-bofficer 8 6 7 5
-wladya 3 4 5 4
-bpeshka 5 5 6 5
-wloshad 4 1 3 3
+wofficer 7 6 5 8
+bpeshka 4 7 5 8
+wkorol 8 6 8 5
+bpeshka 5 8 6 8
+wkorol 8 5 8 6
+bpeshka 6 8 7 8
+wloshad 5 7 7 6
+
+wofficer 7 6 5 8
+bpeshka 4 7 5 8
+wkorol 8 6 7 6
+bpeshka 5 8 6 8
+wkorol 7 6 8 6
+bpeshka 6 8 7 8
+wloshad 5 7 7 6
+
+wofficer 7 6 5 8
+bpeshka 4 7 5 8
+wkorol 8 6 7 5
+bpeshka 5 8 6 8
+wkorol 7 5 8 6
+bpeshka 6 8 7 8
+wloshad 5 7 7 6
+
+wofficer 7 6 5 8
+bpeshka 4 7 5 8
+wloshad 5 7 6 5
+bpeshka 5 8 6 8
+wloshad 6 5 5 7
+bpeshka 6 8 7 8
+wloshad 5 7 7 6
+
+wofficer 7 6 5 8
+bpeshka 4 7 5 8
+wloshad 5 7 6 5
+bpeshka 5 8 6 8
+wloshad 6 5 8 4
+bpeshka 6 8 7 8
+wloshad 8 4 7 6
+
+wofficer 7 6 5 8
+bpeshka 4 7 5 8
+wloshad 5 7 6 5
+bpeshka 5 8 6 8
+wloshad 6 5 4 6
+bpeshka 6 8 7 8
+wloshad 4 6 6 7
+
+wofficer 7 6 5 8
+bpeshka 4 7 5 8
+wloshad 5 7 4 5
+bpeshka 5 8 6 8
+wloshad 4 5 5 7
+bpeshka 6 8 7 8
+wloshad 5 7 7 6
+
+wofficer 7 6 5 8
+bpeshka 4 7 5 8
+wloshad 5 7 4 5
+bpeshka 5 8 6 8
+wloshad 4 5 6 4
+bpeshka 6 8 7 8
+wloshad 6 4 7 6
+
+wofficer 7 6 5 8
+bpeshka 4 7 5 8
+wloshad 5 7 7 8
+bpeshka 5 8 6 8
+wloshad 7 8 5 7
+bpeshka 6 8 7 8
+wloshad 5 7 7 6
+
+wofficer 7 6 5 8
+bpeshka 4 7 5 8
+wloshad 5 7 3 8
+bpeshka 5 8 6 8
+wloshad 3 8 4 6
+bpeshka 6 8 7 8
+wloshad 4 6 6 7
+
+wofficer 7 6 5 8
+bpeshka 4 7 5 8
+wloshad 5 7 3 8
+bpeshka 5 8 6 8
+wloshad 3 8 5 7
+bpeshka 6 8 7 8
+wloshad 5 7 7 6
+
+wofficer 7 6 5 8
+bpeshka 4 7 5 8
+wloshad 5 7 3 6
+bpeshka 5 8 6 8
+wloshad 3 6 4 8
+bpeshka 6 8 7 8
+wloshad 4 8 6 7
+
+wofficer 7 6 5 8
+bpeshka 4 7 5 8
+wloshad 5 7 3 6
+bpeshka 5 8 6 8
+wloshad 3 6 5 7
+bpeshka 6 8 7 8
+wloshad 5 7 7 6
+
+wofficer 7 6 5 8
+bpeshka 4 7 5 8
+wloshad 5 7 3 6
+bpeshka 5 8 6 8
+wloshad 3 6 5 5
+bpeshka 6 8 7 8
+wloshad 5 5 6 7
+
+wofficer 7 6 5 8
+bpeshka 4 7 5 8
+wloshad 5 7 3 6
+bpeshka 5 8 6 8
+wloshad 3 6 5 5
+bpeshka 6 8 7 8
+wloshad 5 5 7 6
+
+wloshad 5 7 6 5
+bkorol 8 8 7 8
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 6 5 8 4
+bpeshka 4 7 5 7
+wloshad 8 4 7 6
+
+wloshad 5 7 6 5
+bkorol 8 8 7 8
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 6 5 4 6
+bpeshka 4 7 5 7
+wloshad 4 6 6 7
+
+wloshad 5 7 6 5
+bkorol 8 8 7 8
+wofficer 7 6 6 7
+bkorol 7 8 8 8
+wloshad 6 5 8 4
+bpeshka 4 7 5 7
+wloshad 8 4 7 6
+
+wloshad 5 7 6 5
+bkorol 8 8 7 8
+wloshad 6 5 7 7
+bkorol 7 8 6 8
+wkorol 8 6 8 7
+bpeshka 4 7 5 7
+wloshad 7 7 5 6
+
+wloshad 5 7 6 5
+bkorol 8 8 7 8
+wloshad 6 5 8 4
+bkorol 7 8 8 8
+wofficer 7 6 8 7
+bpeshka 4 7 5 7
+wloshad 8 4 7 6
+
+wloshad 5 7 6 5
+bkorol 8 8 7 8
+wloshad 6 5 8 4
+bkorol 7 8 8 8
+wofficer 7 6 6 7
+bpeshka 4 7 5 7
+wloshad 8 4 7 6
+
+wloshad 5 7 6 5
+bkorol 8 8 7 8
+wloshad 6 5 8 4
+bpeshka 4 7 5 7
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 8 4 7 6
+
+wloshad 5 7 6 5
+bkorol 8 8 7 8
+wloshad 6 5 8 4
+bpeshka 4 7 5 7
+wofficer 7 6 6 7
+bkorol 7 8 8 8
+wloshad 8 4 7 6
+
+wloshad 5 7 6 5
+bkorol 8 8 7 8
+wloshad 6 5 4 6
+bkorol 7 8 8 8
+wofficer 7 6 8 7
+bpeshka 4 7 5 7
+wloshad 4 6 6 7
+
+wloshad 5 7 6 5
+bkorol 8 8 7 8
+wloshad 6 5 4 6
+bpeshka 4 7 5 7
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 4 6 6 7
+
+wloshad 5 7 6 5
+bkorol 8 8 7 8
+wloshad 6 5 4 4
+bkorol 7 8 6 8
+wkorol 8 6 8 7
+bpeshka 4 7 5 7
+wloshad 4 4 5 6
+
+wloshad 5 7 6 5
+bpeshka 4 7 5 7
+wloshad 6 5 8 4
+bkorol 8 8 7 8
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 8 4 7 6
+
+wloshad 5 7 6 5
+bpeshka 4 7 5 7
+wloshad 6 5 8 4
+bkorol 8 8 7 8
+wofficer 7 6 6 7
+bkorol 7 8 8 8
+wloshad 8 4 7 6
+
+wloshad 5 7 6 5
+bpeshka 4 7 5 7
+wloshad 6 5 4 6
+bkorol 8 8 7 8
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 4 6 6 7
+
+wloshad 5 7 4 5
+bkorol 8 8 7 8
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 4 5 6 4
+bpeshka 4 7 5 7
+wloshad 6 4 7 6
+
+wloshad 5 7 4 5
+bkorol 8 8 7 8
+wofficer 7 6 6 7
+bkorol 7 8 8 8
+wloshad 4 5 6 4
+bpeshka 4 7 5 7
+wloshad 6 4 7 6
+
+wloshad 5 7 4 5
+bkorol 8 8 7 8
+wloshad 4 5 3 7
+bkorol 7 8 6 8
+wkorol 8 6 8 7
+bpeshka 4 7 5 7
+wloshad 3 7 5 6
+
+wloshad 5 7 4 5
+bkorol 8 8 7 8
+wloshad 4 5 6 6
+bkorol 7 8 6 8
+wkorol 8 6 8 7
+bpeshka 4 7 5 7
+wloshad 6 6 4 7
+
+wloshad 5 7 4 5
+bkorol 8 8 7 8
+wloshad 4 5 6 4
+bkorol 7 8 8 8
+wofficer 7 6 8 7
+bpeshka 4 7 5 7
+wloshad 6 4 7 6
+
+wloshad 5 7 4 5
+bkorol 8 8 7 8
+wloshad 4 5 6 4
+bkorol 7 8 8 8
+wofficer 7 6 6 7
+bpeshka 4 7 5 7
+wloshad 6 4 7 6
+
+wloshad 5 7 4 5
+bkorol 8 8 7 8
+wloshad 4 5 6 4
+bkorol 7 8 6 8
+wkorol 8 6 8 7
+bpeshka 4 7 5 7
+wloshad 6 4 5 6
+
+wloshad 5 7 4 5
+bkorol 8 8 7 8
+wloshad 4 5 6 4
+bpeshka 4 7 5 7
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 6 4 7 6
+
+wloshad 5 7 4 5
+bkorol 8 8 7 8
+wloshad 4 5 6 4
+bpeshka 4 7 5 7
+wofficer 7 6 6 7
+bkorol 7 8 8 8
+wloshad 6 4 7 6
+
+wloshad 5 7 4 5
+bkorol 8 8 7 8
+wloshad 4 5 2 6
+bkorol 7 8 6 8
+wkorol 8 6 8 7
+bpeshka 4 7 5 7
+wloshad 2 6 4 7
+
+wloshad 5 7 4 5
+bpeshka 4 7 5 7
+wloshad 4 5 6 4
+bkorol 8 8 7 8
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 6 4 7 6
+
+wloshad 5 7 4 5
+bpeshka 4 7 5 7
+wloshad 4 5 6 4
+bkorol 8 8 7 8
+wofficer 7 6 6 7
+bkorol 7 8 8 8
+wloshad 6 4 7 6
+
+wloshad 5 7 3 8
+bkorol 8 8 7 8
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 3 8 4 6
+bpeshka 4 7 5 7
+wloshad 4 6 6 7
+
+wloshad 5 7 3 8
+bkorol 8 8 7 8
+wloshad 3 8 4 6
+bkorol 7 8 8 8
+wofficer 7 6 8 7
+bpeshka 4 7 5 7
+wloshad 4 6 6 7
+
+wloshad 5 7 3 8
+bkorol 8 8 7 8
+wloshad 3 8 4 6
+bpeshka 4 7 5 7
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 4 6 6 7
+
+wloshad 5 7 3 8
+bkorol 8 8 7 8
+wloshad 3 8 2 6
+bkorol 7 8 6 8
+wkorol 8 6 8 7
+bpeshka 4 7 5 7
+wloshad 2 6 4 7
+
+wloshad 5 7 3 8
+bpeshka 4 7 5 7
+wloshad 3 8 4 6
+bkorol 8 8 7 8
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 4 6 6 7
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 3 6 4 8
+bpeshka 4 7 5 7
+wloshad 4 8 6 7
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 3 6 5 5
+bpeshka 4 7 5 7
+wloshad 5 5 6 7
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 3 6 5 5
+bpeshka 4 7 5 7
+wloshad 5 5 7 6
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wofficer 7 6 6 7
+bkorol 7 8 8 8
+wloshad 3 6 5 5
+bpeshka 4 7 5 7
+wloshad 5 5 7 6
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wloshad 3 6 4 8
+bkorol 7 8 8 8
+wofficer 7 6 8 7
+bpeshka 4 7 5 7
+wloshad 4 8 6 7
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wloshad 3 6 4 8
+bkorol 7 8 6 8
+wkorol 8 6 8 7
+bpeshka 4 7 5 7
+wloshad 4 8 5 6
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wloshad 3 6 4 8
+bpeshka 4 7 5 7
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 4 8 6 7
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wloshad 3 6 4 4
+bkorol 7 8 6 8
+wkorol 8 6 8 7
+bpeshka 4 7 5 7
+wloshad 4 4 5 6
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wloshad 3 6 2 8
+bkorol 7 8 6 8
+wkorol 8 6 8 7
+bpeshka 4 7 5 7
+wloshad 2 8 4 7
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wloshad 3 6 5 5
+bkorol 7 8 8 8
+wofficer 7 6 8 7
+bpeshka 4 7 5 7
+wloshad 5 5 6 7
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wloshad 3 6 5 5
+bkorol 7 8 8 8
+wofficer 7 6 8 7
+bpeshka 4 7 5 7
+wloshad 5 5 7 6
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wloshad 3 6 5 5
+bkorol 7 8 8 8
+wofficer 7 6 6 7
+bpeshka 4 7 5 7
+wloshad 5 5 7 6
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wloshad 3 6 5 5
+bkorol 7 8 6 8
+wkorol 8 6 8 7
+bpeshka 4 7 5 7
+wloshad 5 5 4 7
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wloshad 3 6 5 5
+bpeshka 4 7 5 7
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 5 5 6 7
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wloshad 3 6 5 5
+bpeshka 4 7 5 7
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 5 5 7 6
+
+wloshad 5 7 3 6
+bkorol 8 8 7 8
+wloshad 3 6 5 5
+bpeshka 4 7 5 7
+wofficer 7 6 6 7
+bkorol 7 8 8 8
+wloshad 5 5 7 6
+
+wloshad 5 7 3 6
+bpeshka 4 7 5 7
+wloshad 3 6 4 8
+bkorol 8 8 7 8
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 4 8 6 7
+
+wloshad 5 7 3 6
+bpeshka 4 7 5 7
+wloshad 3 6 5 5
+bkorol 8 8 7 8
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 5 5 6 7
+
+wloshad 5 7 3 6
+bpeshka 4 7 5 7
+wloshad 3 6 5 5
+bkorol 8 8 7 8
+wofficer 7 6 8 7
+bkorol 7 8 8 8
+wloshad 5 5 7 6
+
+wloshad 5 7 3 6
+bpeshka 4 7 5 7
+wloshad 3 6 5 5
+bkorol 8 8 7 8
+wofficer 7 6 6 7
+bkorol 7 8 8 8
+wloshad 5 5 7 6
 
