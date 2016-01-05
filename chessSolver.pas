@@ -19,12 +19,14 @@ const n        = 8;
       bkorol    = -korol;
       white    =  1;
       black    = -1;
+      isLog = false;
 
 
 var field: array [1..n, 1..n] of integer;
     moves: array [1..10000] of move;
     countOfPossibleMoves: integer;
     isCheckToWhite, isCheckToBlack: boolean;
+    z: integer;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -62,7 +64,7 @@ begin
   begin
     for j:=1 to n do
     begin
-      if (field[i,j] = korol) and (field[i,j]*color>0) then
+      if (field[i,j] = korol*color) then
       begin
         founded :=true;
         i0:=i;
@@ -96,6 +98,7 @@ begin
   readln(fName);
   assign(f, fName);
   reset(f);
+  readln(f,z);
   while not eof(f) do
   begin
     readln(f,figure,i,j);
@@ -331,7 +334,6 @@ begin
                          else write(' ');
     end;
   end;
-  readkey;
 end; // end showField
 procedure saveField;
 var f: text;
@@ -388,28 +390,204 @@ end;
 //-----------------------------------------------------------------------------
 function isCheckTo(color: integer):boolean; //TOWRITE
 var res: boolean;
+    i,j: integer;
 begin
+  findKorol(color,i,j);
+  res := isUnderAttackBy(-color, i,j);
   isCheckTo := res;
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure AddAllPossibleMoves(var movarr: mas;color: integer);//TOWRITE
+function colorOf(f: integer): integer;
 begin
-
+  if (f>0) then colorOf := 1
+           else if (f<0) then colorOf := -1;
 end;
-function isMateTo(color: integer): boolean;
-var res: boolean;
+procedure AddMove(m: move);
 begin
-  res := true;
-  if (isCheckTo(color)) then
+  if (m.iEnd>=1) and (m.iEnd<=8) and (m.jEnd>=1) and (m.jEnd<=8) then
   begin
-
+    doMove(m);
+    if (not isCheckTo(colorOf(m.figureStart))) then
+    begin
+      inc(countOfPossibleMoves);
+      moves[countOfPossibleMoves] := m;
+    end;
+    UndoMove(m);
   end;
-  isMateTo := res;
+end;
+procedure AddMovesDist(i0,j0,dn,dm: integer);
+var i,j: integer;
+    currentfigure: integer;
+    current: integer;
+    curmov: move;
+begin
+  i := i0 + dn;
+  j := j0 + dm;
+  currentFigure := getFigureOn(i0,j0);
+  current := getFigureOn(i,j);
+  if (dn <> 0) or (dm <> 0) then
+  begin
+    while (current*currentFigure <= 0) and (i<=n) and (i>=1) and (j<=n) and (j>=1) do
+    begin
+      curmov := CreateMove(i0,j0,i,j, currentFigure);
+      addMove(curmov);
+      if (current*currentFigure < 0) then break;
+      i := i + dn;
+      j := j + dm;
+      current := getFigureOn(i,j);
+
+    end;
+  end;
+end;
+procedure AddAllPossibleMoves(color: integer);//TOWRITE
+var i,j: integer;
+    k: integer;
+    isGoodMove: boolean;
+    curfig: integer; // Curent Figure
+    curmov: move;
+    movi, movj: integer;
+begin
+  for i:=1 to n do
+  begin
+    for j:=1 to n do
+    begin
+      if (field[i,j]*color > 0) then
+      begin
+        curfig := field[i,j];
+        if (abs(curfig) = peshka) then
+        begin
+          if (color = white) then
+          begin
+            if (getFigureOn(i-1,j-1)*color<0) then
+            begin
+              curmov := CreateMove(i,j,i-1,j-1, curfig);
+              AddMove(curMov);
+            end;
+            if (getFigureOn(i-1,j+1)*color<0) then
+            begin
+              curmov := CreateMove(i,j,i-1,j+1, curfig);
+              AddMove(curMov);
+            end;
+            if (getFigureOn(i-1,j) = 0) then
+            begin
+              curmov := CreateMove(i,j,i-1,j, curfig);
+              AddMove(curMov);
+            end;
+          end else
+          begin
+            if (getFigureOn(i+1,j-1)*color<0) then
+            begin
+              curmov := CreateMove(i,j,i+1,j-1, curfig);
+              AddMove(curMov);
+            end;
+            if (getFigureOn(i+1,j+1)*color<0) then
+            begin
+              curmov := CreateMove(i,j,i+1,j+1, curfig);
+              AddMove(curMov);
+            end;
+            if (getFigureOn(i+1,j) = 0) then
+            begin
+              curmov := CreateMove(i,j,i+1,j, curfig);
+              AddMove(curMov);
+            end;
+          end;
+        end else
+        if (abs(curfig) = loshad) then //-----------------------------------------------------Loshad
+        begin
+          if (getFigureOn(i-2,j-1)*color <= 0) then
+          begin
+            curmov := CreateMove(i,j,i-2,j-2, curfig);
+            AddMove(curMov);
+          end;
+          if (getFigureOn(i-2,j+1)*color <= 0) then
+          begin
+            curmov := CreateMove(i,j,i-2,j+1, curfig);
+            AddMove(curMov);
+          end;
+          if (getFigureOn(i+2,j-1)*color <= 0) then
+          begin
+            curmov := CreateMove(i,j,i+2,j-1, curfig);
+            AddMove(curMov);
+          end;
+          if (getFigureOn(i+2,j+1)*color <= 0) then
+          begin
+            curmov := CreateMove(i,j,i+2,j+1, curfig);
+            AddMove(curMov);
+          end;
+
+          if (getFigureOn(i-1,j-2)*color <= 0) then
+          begin
+            curmov := CreateMove(i,j,i-1,j-2, curfig);
+            AddMove(curMov);
+          end;
+          if (getFigureOn(i-1,j+2)*color <= 0) then
+          begin
+            curmov := CreateMove(i,j,i-1,j+2, curfig);
+            AddMove(curMov);
+          end;
+          if (getFigureOn(i+1,j-2)*color <= 0) then
+          begin
+            curmov := CreateMove(i,j,i+1,j-2, curfig);
+            AddMove(curMov);
+          end;
+          if (getFigureOn(i+1,j+2)*color <= 0) then
+          begin
+            curmov := CreateMove(i,j,i+1,j+2, curfig);
+            AddMove(curMov);
+          end;
+        end else
+        if (abs(curfig) = officer) then
+        begin
+          addmovesDist(i,j,-1,-1);
+          addmovesDist(i,j,-1, 1);
+          addmovesDist(i,j, 1,-1);
+          addmovesDist(i,j, 1, 1);
+        end else
+        if (abs(curfig) = ladya) then
+        begin
+          addmovesDist(i,j,-1, 0);
+          addmovesDist(i,j, 0, 1);
+          addmovesDist(i,j, 1, 0);
+          addmovesDist(i,j, 0,-1);
+        end else
+        if (abs(curfig) = ferz) then
+        begin
+          addmovesDist(i,j,-1,-1);
+          addmovesDist(i,j,-1, 1);
+          addmovesDist(i,j, 1,-1);
+          addmovesDist(i,j, 1, 1);
+          addmovesDist(i,j,-1, 0);
+          addmovesDist(i,j, 0, 1);
+          addmovesDist(i,j, 1, 0);
+          addmovesDist(i,j, 0,-1);
+        end else
+        if (abs(curfig) = korol) then
+        begin
+          curmov := CreateMove(i,j,i-1,j-1, curfig);
+          AddMove(curmov);
+          curmov := CreateMove(i,j,i-1,j,   curfig);
+          AddMove(curmov);
+          curmov := CreateMove(i,j,i-1,j+1, curfig);
+          AddMove(curmov);
+          curmov := CreateMove(i,j,i,  j-1, curfig);
+          AddMove(curmov);
+          curmov := CreateMove(i,j,i,  j+1, curfig);
+          AddMove(curmov);
+          curmov := CreateMove(i,j,i+1,j-1, curfig);
+          AddMove(curmov);
+          curmov := CreateMove(i,j,i+1,j,   curfig);
+          AddMove(curmov);
+          curmov := CreateMove(i,j,i+1,j+1, curfig);
+          AddMove(curmov);
+        end;
+      end;
+    end;
+  end;
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure Solve(color, countOfMoves: integer);//TOWRITE
+procedure Solve(color, countOfMoves: integer);
 var FirstPossibleMoveIndex: integer;
     LastPossibleMoveIndex: integer;
     i,j,k: integer;
@@ -432,17 +610,23 @@ begin
     begin
       isCheckToWhite := checkWhite;
       isCheckToBlack := checkBlack;
-      AddAllPossibleMoves(moves, color);
+      AddAllPossibleMoves(color);
       LastPossibleMoveIndex := countOfPossibleMoves;
-      if (LastPossibleMoveIndex < FirstPossibleMoveIndex) then
+      if (LastPossibleMoveIndex < FirstPossibleMoveIndex) and (isCheckTo(black)) then
       begin
           showField;
+          writeln;
+          writeln;
+          textbackground(3);
+          Writeln('solved');
+          readkey;
           saveField;
       end else
       for i := LastPossibleMoveIndex downto FirstPossibleMoveIndex do
       begin
         DoMove(moves[i]);
-        Solve(-color, countOfMoves -1);        
+        if (isLog) then showField;
+        Solve(-color, countOfMoves -1);
         UndoMove(moves[i]);
       end;
       countOfPossibleMoves := FirstPossibleMoveIndex - 1;
@@ -460,4 +644,6 @@ end;
 Begin
   initialize;
   showField;
+  Solve(white,z*2);
+
 end.
