@@ -3,7 +3,7 @@ uses crt;
 type move = record
               iStart, iEnd, jStart, jEnd, figureStart, figureEnd: integer;
             end;
-     mas = array [1..100000] of move;
+     mas = array [1..1000000] of move;
 const n        = 8;
       peshka   = 1;
       loshad   = 2;
@@ -23,15 +23,16 @@ const n        = 8;
 
 
 
-var field: array [1..n, 1..n] of integer;
+var field: array [1..n, 1..n] of longint;
     moves: mas;
-    countOfPossibleMoves: integer;
+    countOfPossibleMoves: longint;
     isCheckToWhite, isCheckToBlack: boolean;
-    z: integer;
+    z: longint;
     MakedMoves: mas;
-    CountOfMakedMoves: integer =0;
-    cVariants: longint = 0;
-    cSolving: longint = 0;
+    CountOfMakedMoves: longint =0;
+    cVariants: int64 = 0;
+    cSolving: int64 = 0;
+    maxcountofpossibleMoves: int64 = 0;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -60,9 +61,9 @@ begin
 end;//End showHelp
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure findKorol(color: integer; var i0,j0: integer);
+procedure findKorol(color: longint; var i0,j0: longint);
 var founded: boolean;
-    i,j: integer;
+    i,j: longint;
 begin
   founded := false;
   for i:=1 to n do
@@ -84,8 +85,8 @@ end;
 //-----------------------------------------------------------------------------
 procedure initialize;
 var fName : string;
-    i,j   : integer;
-    figure: integer;
+    i,j   : longint;
+    figure: longint;
     fin   : textfile;
 begin
   clrscr;
@@ -114,7 +115,7 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function getFigureOn(i,j: integer): integer;
+function getFigureOn(i,j: longint): longint;
 begin
   if (i>=1) and (i<=n) and (j>=1) and (j<=n) then
   begin
@@ -126,9 +127,9 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function searchTo(i0,j0,dn,dm: integer): integer;
-var i,j: integer;
-    current: integer;
+function searchTo(i0,j0,dn,dm: longint): longint;
+var i,j: longint;
+    current: longint;
 begin
 	i := i0 + dn;
 	j := j0 + dm;
@@ -147,9 +148,9 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function isUnderAttackByFigure(figure, i0, j0: integer): boolean;
+function isUnderAttackByFigure(figure, i0, j0: longint): boolean;
 var res: boolean;
-    i,j: integer;
+    i,j: longint;
 begin
   res := false;
   if (abs(figure) = peshka) then
@@ -271,7 +272,7 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function isUnderAttackBy(colorOfattacker, i0, j0: integer): boolean;
+function isUnderAttackBy(colorOfattacker, i0, j0: longint): boolean;
 var res: boolean;
 begin
    res := isUnderAttackByFigure(peshka * colorOfattacker, i0, j0);
@@ -300,7 +301,7 @@ end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 Procedure showField;
-var i,j: integer;
+var i,j: longint;
 begin
    textbackground(7);
   clrscr;
@@ -340,7 +341,7 @@ begin
 end; // end showField
 procedure saveField;
 var f: text;
-    i,j: integer;
+    i,j: longint;
 begin
   assign(f,'out.txt');
   append(f);
@@ -355,7 +356,7 @@ begin
   writeln(f);
   close(f);
 end;
-function figureTOSTR(f: integer): string;
+function figureTOSTR(f: longint): string;
 var res: string;
 begin
   res:= ' ';
@@ -369,7 +370,7 @@ begin
            else res[1] := 'w';
   figuretoSTR:=res;
 end;
-function getCoordStr(i,j: integer): string;
+function getCoordStr(i,j: longint): string;
 var res: string;
 begin
   str(8-i+1, res);
@@ -386,7 +387,7 @@ begin
 end;
 
 procedure saveMoves;
-var i: integer;
+var i: longint;
     f: text;
 begin
   i:=1;
@@ -403,7 +404,7 @@ end;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function CreateMove(iStart, jStart, iEnd, jEnd, figureStart: integer): move;
+function CreateMove(iStart, jStart, iEnd, jEnd, figureStart: longint): move;
 var res: move;
 begin
   res.iStart := iStart;
@@ -440,9 +441,9 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function isCheckTo(color: integer):boolean; //TOWRITE
+function isCheckTo(color: longint):boolean; //TOWRITE
 var res: boolean;
-    i,j: integer;
+    i,j: longint;
 begin
   findKorol(color,i,j);
   res := isUnderAttackBy(-color, i,j);
@@ -450,7 +451,7 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function colorOf(f: integer): integer;
+function colorOf(f: longint): longint;
 begin
   if (f>0) then colorOf := 1
            else if (f<0) then colorOf := -1
@@ -469,10 +470,10 @@ begin
     UndoMove(m);
   end;
 end;
-procedure AddMovesDist(i0,j0,dn,dm: integer);
-var i,j: integer;
-    currentfigure: integer;
-    current: integer;
+procedure AddMovesDist(i0,j0,dn,dm: longint);
+var i,j: longint;
+    currentfigure: longint;
+    current: longint;
     curmov: move;
 begin
   i := i0 + dn;
@@ -493,13 +494,13 @@ begin
     end;
   end;
 end;
-procedure AddAllPossibleMoves(color: integer);//TOWRITE
-var i,j: integer;
-    k: integer;
+procedure AddAllPossibleMoves(color: longint);//TOWRITE
+var i,j: longint;
+    k: longint;
     isGoodMove: boolean;
-    curfig: integer; // Curent Figure
+    curfig: longint; // Curent Figure
     curmov: move;
-    movi, movj: integer;
+    movi, movj: longint;
 begin
   for i:=1 to n do
   begin
@@ -656,10 +657,10 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure Solve(color, countOfMoves: integer);
-var FirstPossibleMoveIndex: integer;
-    LastPossibleMoveIndex: integer;
-    i,j,k: integer;
+procedure Solve(color, countOfMoves: longint);
+var FirstPossibleMoveIndex: longint;
+    LastPossibleMoveIndex: longint;
+    i,j,k: longint;
     checkWhite, checkBlack: boolean;
     isOk: boolean;
 begin
@@ -684,15 +685,17 @@ begin
       LastPossibleMoveIndex := countOfPossibleMoves;
       if (LastPossibleMoveIndex < FirstPossibleMoveIndex) and (isCheckTo(black)) then
       begin
-          showField;
-          writeln;
-          writeln;
-          textbackground(3);
+          //showField;
+          //writeln;
+          //writeln;
+          //textbackground(3);
           inc(cSolving);
-          Writeln('solved: ', cSolving, ' Solve: ', cVariants);
+          if (maxcountOfPossiblemoves < countofPossibleMoves) then maxcountofPossibleMoves := countOfPossibleMoves;
+          Writeln('solved: ', cSolving, ' Solve: ', cVariants, '   max: ', maxcountofpossibleMoves);
 //          readkey;
 //          saveField;
           Savemoves;
+
       end else
       for i := LastPossibleMoveIndex downto FirstPossibleMoveIndex do
       begin
