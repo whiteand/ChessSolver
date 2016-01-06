@@ -312,7 +312,7 @@ begin
       if ((i+j) mod 2 = 0) then textbackground(6)
                             else textbackground(5);
 
-      if (isUnderAttackBy(white,i,j)) then textbackground(4);
+      //if (isUnderAttackBy(white,i,j)) then textbackground(4);
 
       if (field[i,j]>0) then textcolor(15)
                         else textcolor(0);
@@ -368,7 +368,6 @@ begin
   if (f<0) then res[1] := 'b'
            else res[1] := 'w';
   figuretoSTR:=res;
-<<<<<<< HEAD
 end;
 function getCoordStr(i,j: integer): string;
 var res: string;
@@ -384,9 +383,6 @@ begin
   res := res + ' ' + getCoordStr(m.iStart, m.jStart);
   res := res + ' ' + getCoordStr(m.iEnd, m.jEnd);
   MoveToStr := res;
-=======
-
->>>>>>> a663e6c754a453ac058b4de82bdb9689ed68fa75
 end;
 
 procedure saveMoves;
@@ -398,14 +394,7 @@ begin
   append(f);
   for i:=1 to CountOfMakedMoves do
   begin
-<<<<<<< HEAD
     write(f,MoveToSTr(makedmoves[i]),chr(9));
-=======
-    with makedmoves[i] do
-    begin
-      writeln(f,figuretostr(figureStart),' ', iStart,' ', jStart,' ', iEnd,' ', jEnd);
-    end;
->>>>>>> a663e6c754a453ac058b4de82bdb9689ed68fa75
   end;
   writeln(f);
   close(f);
