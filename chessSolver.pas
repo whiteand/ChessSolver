@@ -3,7 +3,7 @@ uses crt;
 type move = record
               iStart, iEnd, jStart, jEnd, figureStart, figureEnd: integer;
             end;
-     mas = array [1..1000000] of move;
+     mas = array [1..1000] of move;
 const n        = 8;
       peshka   = 1;
       loshad   = 2;
@@ -33,10 +33,12 @@ var field: array [1..n, 1..n] of longint;
     cVariants: int64 = 0;
     cSolving: int64 = 0;
     maxcountofpossibleMoves: int64 = 0;
-    buffer: array [1..1000] of string;
+    buffer: array [1..10000] of string;
     buffercursor: longint = 0;
     buffermax: longint;
     outfilename: string;
+    orientation: integer;
+    c: char;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -124,11 +126,24 @@ begin
   countOfPossibleMoves := 0;
   textcolor(14);
   writeln('Enter buffer size: ');
-  readln(buffermax);
   textcolor(7);
+  readln(buffermax);
+  textcolor(14);
+  writeln('Enter Y if a1 is at left bottom corner: ');
+  textcolor(7);
+  readln(c);
+  if (c = 'y') or (c = 'Y') then orientation := -1
+                            else orientation := 1;
+
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+function colorOf(f: integer): integer;
+begin
+  if (f>0) then colorOf := 1
+           else if (f<0) then colorOf := -1
+                         else colorOf := 0;
+end;
 function getFigureOn(i,j: longint): longint;
 begin
   if (i>=1) and (i<=n) and (j>=1) and (j<=n) then
@@ -169,7 +184,7 @@ begin
   res := false;
   if (abs(figure) = peshka) then
   begin
-    if (figure > 0) then
+    if (figure*orientation > 0) then
     begin
     	if (getFigureOn(i0+1,j0+1) = figure) or (getFigureOn(i0+1,j0-1) = figure) then
     	begin
@@ -315,7 +330,7 @@ end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 Procedure showField;
-var i,j: longint;
+var i,j, i0,j0: longint;
 begin
    textbackground(7);
   clrscr;
@@ -323,14 +338,23 @@ begin
   begin
     for j:=1 to n do
     begin
+      if (orientation = -1) then
+      begin
+        i0:=8-i+1;
+        j0:=j;
+      end else
+      begin
+        i0:=i;
+        j0:=8-j+1;
+      end;
 
       if ((i+j) mod 2 = 0) then textbackground(6)
-                            else textbackground(5);
+                               else textbackground(5);
 
-      //if (isUnderAttackBy(white,i,j)) then textbackground(4);
+      //if (isUnderAttackBy(white,i0,j0)) then textbackground(4);
 
-      if (field[i,j]>0) then textcolor(15)
-                        else textcolor(0);
+      if (field[i0,j0]>0) then textcolor(15)
+                          else textcolor(0);
       gotoxy(1+9*j,1+6*i);
       write(' ');
       gotoxy(1+9*j,2+6*i);
@@ -348,8 +372,8 @@ begin
       gotoxy(3+9*j,3+6*i);
       write(' ');
       gotoxy(2+9*j,2+6*i);
-      if (field[i,j]<>0) then write(abs(field[i,j]))
-                         else write(' ');
+      if (field[i0,j0]<>0) then write(abs(field[i0,j0]))
+                           else write(' ');
     end;
   end;
 end; // end showField
@@ -387,7 +411,7 @@ end;
 function getCoordStr(i,j: longint): string;
 var res: string;
 begin
-  str(8-i+1, res);
+  str(i, res);
   res := chr(ord('a') + j - 1) + res;
   getCoordStr := res;
 end;
@@ -451,7 +475,14 @@ begin
   with m do
   begin
     figureEnd := field[iEnd, jEnd];
-    field[iEnd, jEnd] := figureStart;
+    if (iEnd = 1) and (figureStart*orientation = peshka) then
+    begin
+      field[iEnd,jEnd] := ferz*colorOf(figureStart);
+    end else if (iEnd = 8) and (figureStart*orientation = bpeshka) then
+    begin
+      field[iEnd,jEnd] := ferz*colorOf(figureStart);
+    end else field[iEnd, jEnd] := figureStart;
+
     field[iStart, jStart] := 0;
     inc(countOfMakedMoves);
     MakedMoves[countOfMakedMoves]:=m;
@@ -480,12 +511,6 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function colorOf(f: longint): longint;
-begin
-  if (f>0) then colorOf := 1
-           else if (f<0) then colorOf := -1
-                         else colorOf := 0;
-end;
 procedure AddMove(m: move);
 begin
   if (m.iEnd>=1) and (m.iEnd<=8) and (m.jEnd>=1) and (m.jEnd<=8) then
@@ -540,7 +565,7 @@ begin
         curfig := field[i,j];
         if (abs(curfig) = peshka) then
         begin
-          if (color = white) then
+          if (color*orientation = white) then
           begin
             if (getFigureOn(i-1,j-1)*color<0) then
             begin
@@ -714,10 +739,6 @@ begin
       LastPossibleMoveIndex := countOfPossibleMoves;
       if (LastPossibleMoveIndex < FirstPossibleMoveIndex) and (isCheckTo(black)) then
       begin
-          //showField;
-          //writeln;
-          //writeln;
-          //textbackground(3);
           inc(cSolving);
           if (maxcountOfPossiblemoves < countofPossibleMoves) then maxcountofPossibleMoves := countOfPossibleMoves;
           Writeln('solved: ', cSolving, ' Solve: ', cVariants, '   max: ', maxcountofpossibleMoves);
