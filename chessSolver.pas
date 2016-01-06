@@ -33,6 +33,10 @@ var field: array [1..n, 1..n] of longint;
     cVariants: int64 = 0;
     cSolving: int64 = 0;
     maxcountofpossibleMoves: int64 = 0;
+    buffer: array [1..1000] of string;
+    buffercursor: longint = 0;
+    buffermax: longint;
+    outfilename: string;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -102,7 +106,13 @@ begin
   writeln('Enter the file name: ');
   textcolor(7);
   readln(fName);
+  outfilename := 'moves_'+fname;
+  assign(fin, outfilename);
+  rewrite(fin);
+  close(fin);
   assign(fin, fName);
+
+
   reset(fin);
   readln(fin,z);
   while not eof(fin) do
@@ -112,6 +122,10 @@ begin
   end;
   close(fin);
   countOfPossibleMoves := 0;
+  textcolor(14);
+  writeln('Enter buffer size: ');
+  readln(buffermax);
+  textcolor(7);
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -385,20 +399,35 @@ begin
   res := res + ' ' + getCoordStr(m.iEnd, m.jEnd);
   MoveToStr := res;
 end;
-
+procedure savebuf;
+var f: text;
+    i: longint;
+begin
+    assign(f, outfilename);
+    append(f);
+    for i:=1 to buffercursor do
+    begin
+      writeln(f,buffer[i]);
+    end;
+    close(f);
+    buffercursor := 0;
+end;
 procedure saveMoves;
 var i: longint;
-    f: text;
+    s: string;
 begin
   i:=1;
-  assign(f, 'moves.txt');
-  append(f);
+  s:='';
   for i:=1 to CountOfMakedMoves do
   begin
-    write(f,MoveToSTr(makedmoves[i]),chr(9));
+    s := s + MoveToSTr(makedmoves[i])+chr(9)
   end;
-  writeln(f);
-  close(f);
+  inc(buffercursor);
+  buffer[buffercursor] := s;
+  if (buffercursor >=buffermax) then
+  begin
+    savebuf;
+  end;
 
 end;
 
@@ -714,7 +743,11 @@ Begin
   initialize;
   showField;
   readkey;
+  textcolor(7);
+  textbackground(0);
+  clrscr;
   Solve(white,z*2);
+  savebuf;
   writeln('Solved: ',cSolving);
   writeln('Watched: ', cVariants);
   readkey;
