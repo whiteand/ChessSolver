@@ -368,7 +368,21 @@ begin
   if (f<0) then res[1] := 'b'
            else res[1] := 'w';
   figuretoSTR:=res;
-
+end;
+function getCoordStr(i,j: integer): string;
+var res: string;
+begin
+  str(8-i+1, res);
+  res := chr(ord('a') + j - 1) + res;
+  getCoordStr := res;
+end;
+function MoveToStr(m:move): string;
+var res: string;
+begin
+  res := figureToStr(m.figureStart);
+  res := res + ' ' + getCoordStr(m.iStart, m.jStart);
+  res := res + ' ' + getCoordStr(m.iEnd, m.jEnd);
+  MoveToStr := res;
 end;
 
 procedure saveMoves;
@@ -380,10 +394,7 @@ begin
   append(f);
   for i:=1 to CountOfMakedMoves do
   begin
-    with makedmoves[i] do
-    begin
-      writeln(f,figuretostr(figureStart),' ', iStart,' ', jStart,' ', iEnd,' ', jEnd);
-    end;
+    write(f,MoveToSTr(makedmoves[i]),chr(9));
   end;
   writeln(f);
   close(f);
