@@ -29,16 +29,38 @@ var field: array [1..n, 1..n] of longint;
     isCheckToWhite, isCheckToBlack: boolean;
     z: longint;
     MakedMoves: mas;
+
     CountOfMakedMoves: longint =0;
     cVariants: int64 = 0;
     cSolving: int64 = 0;
     maxcountofpossibleMoves: int64 = 0;
-    buffer: array [1..10000] of string;
+    buffer: array [1..20000] of string;
     buffercursor: longint = 0;
     buffermax: longint;
     outfilename: string;
     orientation: integer;
     c: char;
+    MoveMarking: integer;
+    lastMakedMoves: mas;
+operator =(a,b:move)z:boolean;
+begin
+  if (a.iStart = b.iStart) and
+     (a.jStart = b.jStart) and
+     (a.iEnd = b.iEnd) and
+     (a.jEnd = b.jEnd) and
+     (a.figureStart = b.figureStart) then
+     begin
+       z:=true;
+     end else
+     begin
+       z:=false;
+     end;
+
+end;
+operator <>(a,b:move)z:boolean;
+begin
+  z := not (a = b);
+end;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -134,6 +156,11 @@ begin
   readln(c);
   if (c = 'y') or (c = 'Y') then orientation := -1
                             else orientation := 1;
+
+  textcolor(14);
+  writeln('Enter how many moves must be marked by empty strings: ');
+  textcolor(7);
+  readln(MoveMarking);
 
 end;
 //-----------------------------------------------------------------------------
@@ -436,6 +463,11 @@ begin
     close(f);
     buffercursor := 0;
 end;
+procedure AddStrToBuffer(s:string);
+begin
+  inc(buffercursor);
+  buffer[buffercursor] := s;
+end;
 procedure saveMoves;
 var i: longint;
     s: string;
@@ -444,15 +476,21 @@ begin
   s:='';
   for i:=1 to CountOfMakedMoves do
   begin
+    if (i<=MoveMarking) then
+    begin
+      if (lastMakedMoves[i] <> MakedMoves[i]) then AddStrToBuffer('');
+    end;
+  end;
+  for i:=1 to CountOfMakedMoves do
+  begin
     s := s + MoveToSTr(makedmoves[i])+chr(9)
   end;
-  inc(buffercursor);
-  buffer[buffercursor] := s;
+  AddStrToBuffer(s);
   if (buffercursor >=buffermax) then
   begin
     savebuf;
   end;
-
+  lastMakedMoves := makedmoves;
 end;
 
 //-----------------------------------------------------------------------------
