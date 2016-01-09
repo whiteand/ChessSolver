@@ -42,6 +42,7 @@ var field: array [1..n, 1..n] of longint;
     c: char;
     MoveMarking: integer;
     lastMakedMoves: mas;
+    showblack: boolean = true;
 operator =(a,b:move)z:boolean;
 begin
   if (a.iStart = b.iStart) and
@@ -130,10 +131,7 @@ begin
   writeln('Enter the file name: ');
   textcolor(7);
   readln(fName);
-  outfilename := 'moves_'+fname;
-  assign(fin, outfilename);
-  rewrite(fin);
-  close(fin);
+  
   assign(fin, fName);
 
 
@@ -161,7 +159,24 @@ begin
   writeln('Enter how many moves must be marked by empty strings: ');
   textcolor(7);
   readln(MoveMarking);
-
+  textcolor(14);
+  writeln('Do you want to see black moves?(y/n): ');
+  textcolor(7);
+  readln(c);
+  if (c = 'y') or (c = 'Y') then 
+  begin
+    showblack := true
+    outfilename := 'moves_'+fname;
+  end
+  else
+  begin 
+    showblack := false;
+    outfilename := 'whitemoves_'+fname;
+  end;
+  
+  assign(fin, outfilename);
+  rewrite(fin);
+  close(fin);
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -483,7 +498,10 @@ begin
   end;
   for i:=1 to CountOfMakedMoves do
   begin
-    s := s + MoveToSTr(makedmoves[i])+chr(9)
+    if (i mod 2 = 1) or showblack then
+    begin
+      s := s + MoveToSTr(makedmoves[i])+chr(9)
+    end;
   end;
   AddStrToBuffer(s);
   if (buffercursor >=buffermax) then
