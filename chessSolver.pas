@@ -43,6 +43,7 @@ var field: array [1..n, 1..n] of longint;
     MoveMarking: integer;
     lastMakedMoves: mas;
     showblack: boolean = true;
+    fName: string;
 operator =(a,b:move)z:boolean;
 begin
   if (a.iStart = b.iStart) and
@@ -68,8 +69,35 @@ end;
 procedure showHelp;
 begin
   textcolor(14);
-  writeln('You should create a file with datas(Figure, i, j)');
+  writeln('You should to create a file with data');
+  textcolor(13);
+  writeln('If you use FEN notation then file must be like that: ');
   textcolor(15);
+  writeln('First string: Number of moves to make mate(ex: 2)');
+  writeln('Second string: FEN string(ex: 3rk3/8/8/8/8/5pPq/R4P1P5QK1)');
+  writeln('Third string: first move color(w - white, b - black)');
+  writeln(chr(9),'File example');
+  writeln('2');
+  writeln('3rk3/8/8/8/8/5pPq/R4P1P/5QK1');
+  writeln('b');
+  textcolor(13);
+  writeln('If you are NOT using FEN notation then file must be like that: ');
+  textcolor(15);
+  writeln('First string: Number of moves to make mate(ex: 2)');
+  writeln('Other strings: records with format "Figure horizontal vertical"');
+  writeln('For Example: 6 1 3 - means that there is white king at c1 (c - vertical(transformes into 3), 1 - horizontal)');
+  writeln(chr(9),'File example');
+  writeln('2');
+  writeln('-6 1 7');
+  writeln('-5 1 6');
+  writeln('-1 2 8');
+  writeln('6 4 4');
+  writeln('2 7 2');
+
+  textcolor(14);
+  writeln('Figures codes: ');
+  textcolor(15);
+
   writeln('WHITE');
   textcolor(7);
   writeln('peshka:    ', peshka);
@@ -112,14 +140,103 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure initialize;
-var fName : string;
-    i,j   : longint;
-    figure: longint;
-    fin   : textfile;
+procedure makeFieldWithFen(s:string);
+var k,z, i, j: integer;
+procedure next;
+  begin
+    j:=j+1;
+    if(j>8) then
+    begin
+      j:=1;
+      i:=i-1;
+    end;
+  end;
 begin
-  clrscr;
-  showHelp;
+  i:=8;
+  j:=1;
+  for k:=1 to length(s) do
+  begin
+    if (s[k]<>'') and (s[k]<>'/') then
+    begin
+      if (s[k] in ['1'..'8']) then
+      begin
+        for z:=1 to ord(s[k]) - ord('0') do
+        begin
+          field[i,j]:=0;
+          next;
+        end;
+      end else
+      if (s[k] = 'K') then
+      begin
+        field[i,j]:=6;
+        next;
+      end else
+      if (s[k] = 'Q') then
+      begin
+        field[i,j]:=5;
+        next;
+      end else
+      if (s[k] = 'R') then
+      begin
+        field[i,j]:=4;
+        next;
+      end else
+      if (s[k] = 'B') then
+      begin
+        field[i,j]:=3;
+        next;
+      end else
+      if (s[k] = 'N') then
+      begin
+        field[i,j]:=2;
+        next;
+      end else
+      if (s[k] = 'P') then
+      begin
+        field[i,j]:=1;
+        next;
+      end else
+      if (s[k] = 'k') then
+      begin
+        field[i,j]:=-6;
+        next;
+      end else
+      if (s[k] = 'q') then
+      begin
+        field[i,j]:=-5;
+        next;
+      end else
+      if (s[k] = 'r') then
+      begin
+        field[i,j]:=-4;
+        next;
+      end else
+      if (s[k] = 'b') then
+      begin
+        field[i,j]:=-3;
+        next;
+      end else
+      if (s[k] = 'n') then
+      begin
+        field[i,j]:=-2;
+        next;
+      end else
+      if (s[k] = 'p') then
+      begin
+        field[i,j]:=-1;
+        next;
+      end;
+    end;
+  end;
+
+end;
+procedure askField;
+var i,j: integer;
+    variant: string;
+    fen: string;
+    fin:text;
+    figure: integer;
+begin
   for i:=1 to n do
   begin
     for j:=1 to n do
@@ -127,22 +244,53 @@ begin
       field[i,j] := 0;
     end;
   end;
+
   textcolor(14);
-  writeln('Enter the file name: ');
+  write('Do you want to use fen notation? ');
+  textcolor(7);
+  readln(variant);
+  textcolor(14);
+  write('Enter the file name: ');
   textcolor(7);
   readln(fName);
-  
   assign(fin, fName);
-
-
   reset(fin);
   readln(fin,z);
-  while not eof(fin) do
+
+  if (variant = 'y') or (variant = 'Y') or (variant = 'Yes') or (variant = 'YES') or (variant = 'yes') then
   begin
-    readln(fin,figure,i,j);
-    field[i,j] := figure;
-  end;
+
+    readln(fin, fen);
+    makeFieldWithFen(fen);
+    readln(fin, fen);
+    if (fen = 'b') or (fen = 'B') then
+    begin
+      for i:=1 to 8 do
+      begin
+        for j:=1 to 8 do
+        begin
+          field[i,j] := -field[i,j];
+        end;
+      end;
+    end;
+  end else
+  begin
+    while not eof(fin) do
+    begin
+      readln(fin,figure,i,j);
+      field[i,j] := figure;
+    end;
+  end;//end else
   close(fin);
+end;
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+procedure initialize;
+var fin   : textfile;
+begin
+  clrscr;
+  showHelp;
+  askfield;
   countOfPossibleMoves := 0;
   textcolor(14);
   writeln('Enter buffer size: ');
@@ -163,17 +311,17 @@ begin
   writeln('Do you want to see black moves?(y/n): ');
   textcolor(7);
   readln(c);
-  if (c = 'y') or (c = 'Y') then 
+  if (c = 'y') or (c = 'Y') then
   begin
-    showblack := true
+    showblack := true;
     outfilename := 'moves_'+fname;
   end
   else
-  begin 
+  begin
     showblack := false;
     outfilename := 'whitemoves_'+fname;
   end;
-  
+
   assign(fin, outfilename);
   rewrite(fin);
   close(fin);
@@ -798,8 +946,6 @@ begin
           inc(cSolving);
           if (maxcountOfPossiblemoves < countofPossibleMoves) then maxcountofPossibleMoves := countOfPossibleMoves;
           Writeln('solved: ', cSolving, ' Solve: ', cVariants, '   max: ', maxcountofpossibleMoves);
-//          readkey;
-//          saveField;
           Savemoves;
 
       end else
