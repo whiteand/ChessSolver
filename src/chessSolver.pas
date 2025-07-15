@@ -1,3 +1,4 @@
+{$DEFINE SHOULD_LOG}
 Program ChessSolver;
 uses crt;
 type move = record
@@ -20,8 +21,6 @@ const n        = 8;
       white    =  1;
       black    = -1;
       isLog = false;
-
-
 
 var field: array [1..n, 1..n] of longint;
     moves: mas;
@@ -369,7 +368,6 @@ end;
 //-----------------------------------------------------------------------------
 function isUnderAttackByFigure(figure, i0, j0: longint): boolean;
 var res: boolean;
-    i,j: longint;
 begin
   res := false;
   if (abs(figure) = peshka) then
@@ -754,11 +752,8 @@ begin
 end;
 procedure AddAllPossibleMoves(color: longint);//TOWRITE
 var i,j: longint;
-    k: longint;
-    isGoodMove: boolean;
     curfig: longint; // Curent Figure
     curmov: move;
-    movi, movj: longint;
 begin
   for i:=1 to n do
   begin
@@ -918,7 +913,7 @@ end;
 procedure Solve(color, countOfMoves: longint);
 var FirstPossibleMoveIndex: longint;
     LastPossibleMoveIndex: longint;
-    i,j,k: longint;
+    i: longint;
     checkWhite, checkBlack: boolean;
     isOk: boolean;
 begin
@@ -952,7 +947,9 @@ begin
       for i := LastPossibleMoveIndex downto FirstPossibleMoveIndex do
       begin
         DoMove(moves[i]);
-        if (isLog) then showField;
+        {$IFDEF SHOULD_LOG}
+        showField;
+        {$ENDIF}
         Solve(-color, countOfMoves -1);
         UndoMove(moves[i]);
         moves[i] := CreateMove(0,0,0,0,0);
