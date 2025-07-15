@@ -258,7 +258,6 @@ begin
 
   if (variant = 'y') or (variant = 'Y') or (variant = 'Yes') or (variant = 'YES') or (variant = 'yes') then
   begin
-
     readln(fin, fen);
     makeFieldWithFen(fen);
     readln(fin, fen);
@@ -284,6 +283,15 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+function GetOutputFileName(_inputFileName: string): string;
+begin
+  {
+  | TODO:
+  |  Implement this function to generate different output file name
+  |  based on input file name
+  }
+  Exit('moves_output.txt');
+end;
 procedure initialize;
 var fin   : textfile;
 begin
@@ -310,18 +318,8 @@ begin
   writeln('Do you want to see black moves?(y/n): ');
   textcolor(7);
   readln(c);
-  if (c = 'y') or (c = 'Y') then
-  begin
-    showblack := true;
-    outfilename := 'moves_'+fname;
-  end
-  else
-  begin
-    showblack := false;
-    outfilename := 'whitemoves_'+fname;
-  end;
-
-  assign(fin, outfilename);
+  showblack := (c = 'y') or (c = 'Y');
+  assign(fin, GetOutputFileName(fName));
   rewrite(fin);
   close(fin);
 end;
@@ -624,7 +622,7 @@ begin
     close(f);
     buffercursor := 0;
 end;
-procedure AddStrToBuffer(s:string);
+procedure AddStrToBuffer(s: string);
 begin
   inc(buffercursor);
   buffer[buffercursor] := s;
