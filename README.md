@@ -13,3 +13,4 @@ to solve chess puzzles.
 - [ ] output moves contain strange notation like "wladya"
 - [x] out/target folder
 - [x] src folder
+- [x] introduce examples folder
