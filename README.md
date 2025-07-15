@@ -11,5 +11,5 @@ to solve chess puzzles.
 - [ ] It is not clear what results mean
 - [ ] output into stdout is absent
 - [ ] output moves contain strange notation like "wladya"
-- [ ] out/target folder
+- [x] out/target folder
 - [ ] src folder
