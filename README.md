@@ -12,4 +12,4 @@ to solve chess puzzles.
 - [ ] output into stdout is absent
 - [ ] output moves contain strange notation like "wladya"
 - [x] out/target folder
-- [ ] src folder
+- [x] src folder
