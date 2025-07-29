@@ -23,13 +23,12 @@ const n        = 8;
       isLog = false;
 
 type TBoard = array [1..n, 1..n] of shortint;
-var field: TBoard;
+var board: TBoard;
     moves: mas;
     countOfPossibleMoves: longint;
     isCheckToWhite, isCheckToBlack: boolean;
     z: longint;
     MakedMoves: mas;
-
     CountOfMakedMoves: longint =0;
     cVariants: int64 = 0;
     cSolving: int64 = 0;
@@ -168,7 +167,7 @@ begin
   begin
     for j:=1 to n do
     begin
-      if (field[i,j] = korol*color) then
+      if (board[i,j] = korol*color) then
       begin
         founded :=true;
         i0:=i;
@@ -181,7 +180,7 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure makeFieldWithFen(s:string);
+procedure makeBoardWithFen(s:string);
 var k,z, i, j: integer;
 procedure next;
   begin
@@ -203,75 +202,75 @@ begin
       begin
         for z:=1 to ord(s[k]) - ord('0') do
         begin
-          field[i,j]:=0;
+          board[i,j]:=0;
           next;
         end;
       end else
       if (s[k] = 'K') then
       begin
-        field[i,j]:=6;
+        board[i,j]:=6;
         next;
       end else
       if (s[k] = 'Q') then
       begin
-        field[i,j]:=5;
+        board[i,j]:=5;
         next;
       end else
       if (s[k] = 'R') then
       begin
-        field[i,j]:=4;
+        board[i,j]:=4;
         next;
       end else
       if (s[k] = 'B') then
       begin
-        field[i,j]:=3;
+        board[i,j]:=3;
         next;
       end else
       if (s[k] = 'N') then
       begin
-        field[i,j]:=2;
+        board[i,j]:=2;
         next;
       end else
       if (s[k] = 'P') then
       begin
-        field[i,j]:=1;
+        board[i,j]:=1;
         next;
       end else
       if (s[k] = 'k') then
       begin
-        field[i,j]:=-6;
+        board[i,j]:=-6;
         next;
       end else
       if (s[k] = 'q') then
       begin
-        field[i,j]:=-5;
+        board[i,j]:=-5;
         next;
       end else
       if (s[k] = 'r') then
       begin
-        field[i,j]:=-4;
+        board[i,j]:=-4;
         next;
       end else
       if (s[k] = 'b') then
       begin
-        field[i,j]:=-3;
+        board[i,j]:=-3;
         next;
       end else
       if (s[k] = 'n') then
       begin
-        field[i,j]:=-2;
+        board[i,j]:=-2;
         next;
       end else
       if (s[k] = 'p') then
       begin
-        field[i,j]:=-1;
+        board[i,j]:=-1;
         next;
       end;
     end;
   end;
 
 end;
-procedure askField;
+procedure AskBoard;
 var i,j: integer;
     variant: string;
     fen: string;
@@ -282,7 +281,7 @@ begin
   begin
     for j:=1 to n do
     begin
-      field[i,j] := 0;
+      board[i,j] := 0;
     end;
   end;
 
@@ -301,7 +300,7 @@ begin
   if (variant = 'y') or (variant = 'Y') or (variant = 'Yes') or (variant = 'YES') or (variant = 'yes') then
   begin
     readln(fin, fen);
-    makeFieldWithFen(fen);
+    makeBoardWithFen(fen);
     readln(fin, fen);
     if (fen = 'b') or (fen = 'B') then
     begin
@@ -309,7 +308,7 @@ begin
       begin
         for j:=1 to 8 do
         begin
-          field[i,j] := -field[i,j];
+          board[i,j] := -board[i,j];
         end;
       end;
     end;
@@ -318,7 +317,7 @@ begin
     while not eof(fin) do
     begin
       readln(fin,figure,i,j);
-      field[i,j] := figure;
+      board[i,j] := figure;
     end;
   end;//end else
   close(fin);
@@ -339,7 +338,7 @@ var fin   : textfile;
 begin
   clrscr;
   showHelp;
-  askfield;
+  AskBoard;
   countOfPossibleMoves := 0;
   textcolor(14);
   writeln('Enter buffer size: ');
@@ -377,7 +376,7 @@ function getFigureOn(i,j: longint): longint;
 begin
   if (i>=1) and (i<=n) and (j>=1) and (j<=n) then
   begin
-    getFigureOn := field[i,j];
+    getFigureOn := board[i,j];
   end else
   begin
     getFigureOn := 0;
@@ -555,7 +554,7 @@ begin
    end;
    isUnderAttackBy := res;
 end;
-procedure saveField;
+procedure saveBoard;
 var f: text;
     i,j: longint;
 begin
@@ -565,7 +564,7 @@ begin
   begin
     for j:=1 to n do
     begin
-      write(f, field[i,j]:3);
+      write(f, board[i,j]:3);
     end;
     writeln(f);
   end;
@@ -666,16 +665,16 @@ procedure DoMove(var m: move);
 begin
   with m do
   begin
-    figureEnd := field[iEnd, jEnd];
+    figureEnd := board[iEnd, jEnd];
     if (iEnd = 1) and (figureStart*orientation = peshka) then
     begin
-      field[iEnd,jEnd] := ferz*colorOf(figureStart);
+      board[iEnd,jEnd] := ferz*colorOf(figureStart);
     end else if (iEnd = 8) and (figureStart*orientation = bpeshka) then
     begin
-      field[iEnd,jEnd] := ferz*colorOf(figureStart);
-    end else field[iEnd, jEnd] := figureStart;
+      board[iEnd,jEnd] := ferz*colorOf(figureStart);
+    end else board[iEnd, jEnd] := figureStart;
 
-    field[iStart, jStart] := 0;
+    board[iStart, jStart] := 0;
     inc(countOfMakedMoves);
     MakedMoves[countOfMakedMoves]:=m;
   end;
@@ -686,8 +685,8 @@ procedure UndoMove(var m: move);
 begin
   with m do
   begin
-    field[iStart, jStart] := figureStart;
-    field[iEnd, jEnd] := figureEnd;
+    board[iStart, jStart] := figureStart;
+    board[iEnd, jEnd] := figureEnd;
     dec(CountofMakedMoves);
   end;
 end;
@@ -749,9 +748,9 @@ begin
   begin
     for j:=1 to n do
     begin
-      if (field[i,j]*color > 0) then
+      if (board[i,j]*color > 0) then
       begin
-        curfig := field[i,j];
+        curfig := board[i,j];
         if (abs(curfig) = peshka) then
         begin
           if (color*orientation = white) then
@@ -939,7 +938,7 @@ begin
         DoMove(moves[i]);
         {$IFDEF SHOULD_LOG}
         writeln;
-        ShowChessBoard(field);
+        ShowChessBoard(board);
         {$ENDIF}
         Solve(-color, countOfMoves -1);
         UndoMove(moves[i]);
@@ -953,7 +952,7 @@ end;
 
 Begin
   initialize;
-  ShowChessBoard(field);
+  ShowChessBoard(board);
   readkey;
   textcolor(7);
   textbackground(0);
