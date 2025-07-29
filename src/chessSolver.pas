@@ -1,4 +1,4 @@
-{$DEFINE SHOULD_LOG}
+{$DEFINE SHOULD_LOG_NOT}
 Program ChessSolver;
 uses crt;
 type move = record
@@ -22,7 +22,8 @@ const n        = 8;
       black    = -1;
       isLog = false;
 
-var field: array [1..n, 1..n] of longint;
+type TBoard = array [1..n, 1..n] of shortint;
+var field: TBoard;
     moves: mas;
     countOfPossibleMoves: longint;
     isCheckToWhite, isCheckToBlack: boolean;
@@ -36,7 +37,6 @@ var field: array [1..n, 1..n] of longint;
     buffer: array [1..20000] of string;
     buffercursor: longint = 0;
     buffermax: longint;
-    outfilename: string;
     orientation: integer;
     c: char;
     MoveMarking: integer;
@@ -61,6 +61,48 @@ end;
 operator <>(a,b:move)z:boolean;
 begin
   z := not (a = b);
+end;
+
+procedure ShowChessBoard(
+  var board: TBoard
+);
+const COLOR_WHITE     = 15;
+      COLOR_BLACK     = 0;
+      COLOR_BLUE      = 1;
+      COLOR_DARK_GRAY = 8;
+var r: integer;
+    c: integer;
+    cell: longint;
+begin
+  for r := 1 to n do
+  begin
+    for c := 1 to n do
+    begin
+      cell := board[r, c];
+      if (cell = 0) then
+      begin
+        TextColor(COLOR_DARK_GRAY);
+        if ((r + c) mod 2 = 0)
+          then write('▫ ')
+          else write('▪ ');
+        TextColor(COLOR_WHITE)
+      end else case cell of 
+        bpeshka: begin TextColor(Blue); write('♙ '); TextColor(COLOR_WHITE) end;
+        peshka: begin write('♟ '); end;
+        bladya: begin TextColor(Blue); write('♖ '); TextColor(COLOR_WHITE) end;
+        ladya: begin write('♜ '); end;
+        bloshad: begin TextColor(Blue); write('♘ '); TextColor(COLOR_WHITE) end;
+        loshad: begin write('♞ '); end;
+        officer: begin write('♝ '); end;
+        bofficer: begin TextColor(Blue); write('♗ '); TextColor(COLOR_WHITE) end;
+        ferz: begin write('♛ '); end;
+        bferz: begin TextColor(Blue); write('♕ '); TextColor(COLOR_WHITE) end;
+        korol: begin write('♚ '); end;
+        bkorol: begin TextColor(Blue); write('♔ '); TextColor(COLOR_WHITE) end;
+          else write('?'); end;
+    end;
+    writeln;
+  end;
 end;
 
 //-----------------------------------------------------------------------------
@@ -513,56 +555,6 @@ begin
    end;
    isUnderAttackBy := res;
 end;
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-Procedure showField;
-var i,j, i0,j0: longint;
-begin
-   textbackground(7);
-  clrscr;
-  for i:=1 to n do
-  begin
-    for j:=1 to n do
-    begin
-      if (orientation = -1) then
-      begin
-        i0:=8-i+1;
-        j0:=j;
-      end else
-      begin
-        i0:=i;
-        j0:=8-j+1;
-      end;
-
-      if ((i+j) mod 2 = 0) then textbackground(6)
-                               else textbackground(5);
-
-      //if (isUnderAttackBy(white,i0,j0)) then textbackground(4);
-
-      if (field[i0,j0]>0) then textcolor(15)
-                          else textcolor(0);
-      gotoxy(1+9*j,1+6*i);
-      write(' ');
-      gotoxy(1+9*j,2+6*i);
-      write(' ');
-      gotoxy(1+9*j,3+6*i);
-      write(' ');
-      gotoxy(2+9*j,1+6*i);
-      write(' ');
-      gotoxy(2+9*j,3+6*i);
-      write(' ');
-      gotoxy(3+9*j,1+6*i);
-      write(' ');
-      gotoxy(3+9*j,2+6*i);
-      write(' ');
-      gotoxy(3+9*j,3+6*i);
-      write(' ');
-      gotoxy(2+9*j,2+6*i);
-      if (field[i0,j0]<>0) then write(abs(field[i0,j0]))
-                           else write(' ');
-    end;
-  end;
-end; // end showField
 procedure saveField;
 var f: text;
     i,j: longint;
@@ -613,7 +605,7 @@ procedure savebuf;
 var f: text;
     i: longint;
 begin
-    assign(f, outfilename);
+    assign(f, GetOutputFileName(fName));
     append(f);
     for i:=1 to buffercursor do
     begin
@@ -946,7 +938,8 @@ begin
       begin
         DoMove(moves[i]);
         {$IFDEF SHOULD_LOG}
-        showField;
+        writeln;
+        ShowChessBoard(field);
         {$ENDIF}
         Solve(-color, countOfMoves -1);
         UndoMove(moves[i]);
@@ -957,9 +950,10 @@ begin
     end;
   end;
 end;
+
 Begin
   initialize;
-  showField;
+  ShowChessBoard(field);
   readkey;
   textcolor(7);
   textbackground(0);
