@@ -1,7 +1,20 @@
 {$DEFINE SHOULD_LOG_NOT}
 Program ChessSolver;
 uses crt;
-type move = record
+type
+    PlayerColor = (PlayerColorWhite, PlayerColorBlack);
+    TCmdArgs =
+    record
+        ShowHelp: Boolean;
+        Fen: string;
+        Moves: longint;
+        Color: PlayerColor;
+        BufferSize: longint;
+        A1IsAtTheLeftBottomCorner: boolean;
+        MovesGroupSize: integer;
+        ShowEnemyMoves: boolean;
+    end;
+    move = record
               iStart, iEnd, jStart, jEnd, figureStart, figureEnd: integer;
             end;
      mas = array [1..1000] of move;
@@ -23,7 +36,8 @@ const n        = 8;
       isLog = false;
 
 type TBoard = array [1..n, 1..n] of shortint;
-var board: TBoard;
+var cmdArgs: TCmdArgs;
+    board: TBoard;
     moves: mas;
     countOfPossibleMoves: longint;
     isCheckToWhite, isCheckToBlack: boolean;
@@ -37,7 +51,6 @@ var board: TBoard;
     buffercursor: longint = 0;
     buffermax: longint;
     orientation: integer;
-    c: char;
     MoveMarking: integer;
     lastMakedMoves: mas;
     showblack: boolean = true;
@@ -104,58 +117,140 @@ begin
   end;
 end;
 
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-procedure showHelp;
+procedure ShowHelp;
 begin
-  textcolor(14);
-  writeln('You should to create a file with data');
-  textcolor(13);
-  writeln('If you use FEN notation then file must be like that: ');
-  textcolor(15);
-  writeln('First string: Number of moves to make mate(ex: 2)');
-  writeln('Second string: FEN string(ex: 3rk3/8/8/8/8/5pPq/R4P1P5QK1)');
-  writeln('Third string: first move color(w - white, b - black)');
-  writeln(chr(9),'File example');
-  writeln('2');
-  writeln('3rk3/8/8/8/8/5pPq/R4P1P/5QK1');
-  writeln('b');
-  textcolor(13);
-  writeln('If you are NOT using FEN notation then file must be like that: ');
-  textcolor(15);
-  writeln('First string: Number of moves to make mate(ex: 2)');
-  writeln('Other strings: records with format "Figure horizontal vertical"');
-  writeln('For Example: 6 1 3 - means that there is white king at c1 (c - vertical(transformes into 3), 1 - horizontal)');
-  writeln(chr(9),'File example');
-  writeln('2');
-  writeln('-6 1 7');
-  writeln('-5 1 6');
-  writeln('-1 2 8');
-  writeln('6 4 4');
-  writeln('2 7 2');
+    writeln('Usage: ChessSolver --fen <fen-notation> [--color <white|black>] [--moves <moves>] [--buffer-size <buffer size>] [--a1-at-top-right] [--moves-group-size <group-moves-size>] [--show-enemy-moves]');
+    writeln('Example:');
+    writeln('  ChessSolver --fen r1b4k/b6p/2pp1r2/pp6/4P3/PBNP2R1/1PP3PP/7K --moves 1 --color white');
+    writeln('Options:');
+    writeln('  --fen              - Fen notation string describing the chess board. Read more: http://www.ee.unb.ca/cgi-bin/tervo/fen.pl');
+    writeln('  --color            - Color of the player that should win. Possible values: white | black. Default is white');
+    writeln('  --moves            - Number of expected moves for checkmate to be found');
+    writeln('  --buffer-size      - No one knows what is this parameter, TBD. Default to 10000');
+    writeln('  --a1-at-top-right  - Should show A1 at the top right corner. Defaults to false');
+    writeln('  --moves-group-size - How many moves should be grouped together. Defaults to 0 (means no grouping).');
+    writeln('  --show-enemy-moves - Shows enemy moves in the output. Defaults to false.');
+end;
+function ParseArguments(var args: TCmdArgs): boolean;
+var i: integer;
+    argument: string;
+    expectsFenString: boolean = false;
+    expectsMoves: boolean = false;
+    expectsBufferSize: boolean = false;
+    expectsMovesGroupSize: boolean = false;
+    expectsColor: boolean = false;
+    fenArgumentProvided: boolean = false;
+    bufferSizeProvided: boolean = false;
+    code: Shortint;
+begin
+    args.A1IsAtTheLeftBottomCorner := true;
+    args.Color := PlayerColorWhite;
 
-  textcolor(14);
-  writeln('Figures codes: ');
-  textcolor(15);
-
-  writeln('WHITE');
-  textcolor(7);
-  writeln('peshka:    ', peshka);
-  writeln('loshad:    ', loshad);
-  writeln('officer:   ', officer);
-  writeln('ladya:     ', ladya);
-  writeln('ferz:      ', ferz);
-  writeln('korol:     ', korol);
-  textcolor(15);
-  writeln('BLACK');
-  textcolor(7);
-  writeln('peshka:   ', -peshka);
-  writeln('loshad:   ', -loshad);
-  writeln('officer:  ', -officer);
-  writeln('ladya:    ', -ladya);
-  writeln('ferz:     ', -ferz);
-  writeln('korol:    ', -korol);
-end;//End showHelp
+    for i := 1 to ParamCount() do
+    begin
+        argument := ParamStr(i);
+        if (argument = '--help') then
+        begin
+          args.ShowHelp := true;
+          Exit(true);
+        end
+        else if (argument = '--fen') then expectsFenString := true
+        else if (expectsFenString) then
+        begin
+            if Length(argument) < 15 then
+            begin
+                ShowHelp;
+                writeln('ERROR: Expected --fen <fen-notation-string>, but ', argument, ' occurred');
+                Exit(false);
+            end;
+            {TODO: Add validation of fen string}
+            fenArgumentProvided := true;
+            args.Fen := argument;
+            expectsFenString := false;
+        end else if (argument = '--moves') then expectsMoves := true
+        else if (expectsMoves) then
+        begin
+            Val(argument, args.Moves, code);
+            if code <> 0 then
+            begin
+                ShowHelp;
+                writeln('ERROR: Expected --moves <moves-number>, but ', argument, ' is passed');
+                Exit(false);
+            end;
+            expectsMoves := false;
+        end
+        else if argument = '--buffer-size' then expectsBufferSize := true
+        else if expectsBufferSize then
+        begin
+            Val(argument, args.BufferSize, code);
+            if code <> 0 then
+            begin
+                ShowHelp;
+                writeln('ERROR: Expected --buffer-size <buffer-size>, but ', argument, ' is passed');
+                Exit(false);
+            end;
+            expectsBufferSize := false;
+        end
+        else if argument = '--color' then expectsColor := true
+        else if expectsColor then
+        begin
+            if argument = 'white' then args.Color := PlayerColorWhite
+            else if argument = 'black' then args.Color := PlayerColorBlack
+            else begin
+                ShowHelp;
+                writeln('ERROR: Expected --color <black|white>, but ', argument, ' is passed');
+                Exit(false);
+            end;
+            expectsColor := false
+        end
+        else if argument = '--a1-at-top-right' then args.A1IsAtTheLeftBottomCorner := false
+        else if argument = '--show-enemy-moves' then args.ShowEnemyMoves := true
+        else if argument = '--moves-group-size' then expectsMovesGroupSize := true
+        else if expectsMovesGroupSize then
+        begin
+            Val(argument, args.MovesGroupSize, code);
+            if code <> 0 then
+            begin
+                ShowHelp;
+                writeln('ERROR: Expected --moves-group-size <group size>, but ', argument, ' is passed');
+                Exit(false);
+            end;
+            expectsMovesGroupSize := false;
+        end;
+    end;
+    if expectsFenString or not fenArgumentProvided then
+    begin
+        ShowHelp;
+        writeln('ERROR: Expected --fen <fen-notation-string>, but nothing is passed');
+        Exit(false);
+    end;
+    if expectsMoves then
+    begin
+        ShowHelp;
+        writeln('ERROR: Expected --steps <steps-count>, but nothing is passed');
+        Exit(false);
+    end;
+    if expectsColor then
+    begin
+        ShowHelp;
+        writeln('ERROR: Expected --color <white|black>, but nothing is passed');
+        Exit(false);
+    end;
+    if expectsBufferSize then
+    begin
+        ShowHelp;
+        writeln('ERROR: Expected --buffer-size <buffer-size>, but nothing is passed');
+        Exit(false);
+    end;
+    if expectsMovesGroupSize then
+    begin
+        ShowHelp;
+        writeln('ERROR: Expected --moves-group-size <group size>, but nothing is passed');
+        Exit(false);
+    end;
+    if not bufferSizeProvided then args.BufferSize := 10000;
+    Exit(true);
+end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 procedure findKorol(color: longint; var i0,j0: longint);
@@ -180,8 +275,8 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure makeBoardWithFen(s:string);
-var k,z, i, j: integer;
+procedure MakeBoardWithFen(var board: TBoard; s:string);
+var k,z,i,j: integer;
 procedure next;
   begin
     j:=j+1;
@@ -270,57 +365,16 @@ begin
   end;
 
 end;
-procedure AskBoard;
-var i,j: integer;
-    variant: string;
-    fen: string;
-    fin:text;
-    figure: integer;
+procedure ReverseColors(var board: TBoard);
+var i, j: shortint;
 begin
-  for i:=1 to n do
+  for i:=1 to 8 do
   begin
-    for j:=1 to n do
+    for j:=1 to 8 do
     begin
-      board[i,j] := 0;
+      board[i,j] := -board[i,j];
     end;
   end;
-
-  textcolor(14);
-  write('Do you want to use fen notation? ');
-  textcolor(7);
-  readln(variant);
-  textcolor(14);
-  write('Enter the file name: ');
-  textcolor(7);
-  readln(fName);
-  assign(fin, fName);
-  reset(fin);
-  readln(fin,z);
-
-  if (variant = 'y') or (variant = 'Y') or (variant = 'Yes') or (variant = 'YES') or (variant = 'yes') then
-  begin
-    readln(fin, fen);
-    makeBoardWithFen(fen);
-    readln(fin, fen);
-    if (fen = 'b') or (fen = 'B') then
-    begin
-      for i:=1 to 8 do
-      begin
-        for j:=1 to 8 do
-        begin
-          board[i,j] := -board[i,j];
-        end;
-      end;
-    end;
-  end else
-  begin
-    while not eof(fin) do
-    begin
-      readln(fin,figure,i,j);
-      board[i,j] := figure;
-    end;
-  end;//end else
-  close(fin);
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -333,36 +387,39 @@ begin
   }
   Exit('moves_output.txt');
 end;
-procedure initialize;
-var fin   : textfile;
+procedure Initialize(var cmdArgs: TCmdArgs; var board: TBoard);
+var outputFile: text;
+    i, j: integer;
 begin
   clrscr;
-  showHelp;
-  AskBoard;
+  for i:=1 to n do
+  begin
+    for j:=1 to n do
+    begin
+      board[i,j] := 0;
+    end;
+  end;
+  cmdArgs.Moves := 1;
+  if not ParseArguments(cmdArgs) then Halt(1);
+  if cmdArgs.ShowHelp then
+  begin
+    ShowHelp;
+    Halt(0);
+  end;
+  z := cmdArgs.Moves;
+  writeln('Moves: ', cmdArgs.Moves);
+  writeln('Color: ', cmdArgs.Color);
+  makeBoardWithFen(board, cmdArgs.fen);
+  if cmdArgs.Color = PlayerColorBlack then ReverseColors(board);
   countOfPossibleMoves := 0;
-  textcolor(14);
-  writeln('Enter buffer size: ');
-  textcolor(7);
-  readln(buffermax);
-  textcolor(14);
-  writeln('Enter Y if a1 is at left bottom corner: ');
-  textcolor(7);
-  readln(c);
-  if (c = 'y') or (c = 'Y') then orientation := -1
-                            else orientation := 1;
-
-  textcolor(14);
-  writeln('Enter how many moves must be marked by empty strings: ');
-  textcolor(7);
-  readln(MoveMarking);
-  textcolor(14);
-  writeln('Do you want to see black moves?(y/n): ');
-  textcolor(7);
-  readln(c);
-  showblack := (c = 'y') or (c = 'Y');
-  assign(fin, GetOutputFileName(fName));
-  rewrite(fin);
-  close(fin);
+  buffermax := cmdArgs.BufferSize;
+  if cmdArgs.A1IsAtTheLeftBottomCorner then orientation := -1
+                                       else orientation := 1;
+  MoveMarking := cmdArgs.MovesGroupSize;
+  showblack := cmdArgs.ShowEnemyMoves;
+  assign(outputFile, GetOutputFileName(fName));
+  rewrite(outputFile);
+  close(outputFile);
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -951,7 +1008,7 @@ begin
 end;
 
 Begin
-  initialize;
+  Initialize(cmdArgs, board);
   ShowChessBoard(board);
   readkey;
   textcolor(7);
