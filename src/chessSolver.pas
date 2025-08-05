@@ -9,6 +9,7 @@ type
         Fen: string;
         Moves: longint;
         Color: PlayerColor;
+        OutputFileName: string;
         BufferSize: longint;
         A1IsAtTheLeftBottomCorner: boolean;
         MovesGroupSize: integer;
@@ -36,25 +37,21 @@ const n        = 8;
       isLog = false;
 
 type TBoard = array [1..n, 1..n] of shortint;
+type TBuffer = array [1..20000] of string;
 var cmdArgs: TCmdArgs;
     board: TBoard;
     moves: mas;
     countOfPossibleMoves: longint;
     isCheckToWhite, isCheckToBlack: boolean;
-    z: longint;
     MakedMoves: mas;
     CountOfMakedMoves: longint =0;
     cVariants: int64 = 0;
     cSolving: int64 = 0;
     maxcountofpossibleMoves: int64 = 0;
-    buffer: array [1..20000] of string;
+    buffer: TBuffer;
     buffercursor: longint = 0;
-    buffermax: longint;
     orientation: integer;
-    MoveMarking: integer;
     lastMakedMoves: mas;
-    showblack: boolean = true;
-    fName: string;
 operator =(a,b:move)z:boolean;
 begin
   if (a.iStart = b.iStart) and
@@ -119,11 +116,12 @@ end;
 
 procedure ShowHelp;
 begin
-    writeln('Usage: ChessSolver --fen <fen-notation> [--color <white|black>] [--moves <moves>] [--buffer-size <buffer size>] [--a1-at-top-right] [--moves-group-size <group-moves-size>] [--show-enemy-moves]');
+    writeln('Usage: ChessSolver --fen <fen-notation> -o <output-file-path> [--color <white|black>] [--moves <moves>] [--buffer-size <buffer size>] [--a1-at-top-right] [--moves-group-size <group-moves-size>] [--show-enemy-moves]');
     writeln('Example:');
     writeln('  ChessSolver --fen r1b4k/b6p/2pp1r2/pp6/4P3/PBNP2R1/1PP3PP/7K --moves 1 --color white');
     writeln('Options:');
     writeln('  --fen              - Fen notation string describing the chess board. Read more: http://www.ee.unb.ca/cgi-bin/tervo/fen.pl');
+    writeln('  -o                 - File into which the output will be written');
     writeln('  --color            - Color of the player that should win. Possible values: white | black. Default is white');
     writeln('  --moves            - Number of expected moves for checkmate to be found');
     writeln('  --buffer-size      - No one knows what is this parameter, TBD. Default to 10000');
@@ -139,7 +137,9 @@ var i: integer;
     expectsBufferSize: boolean = false;
     expectsMovesGroupSize: boolean = false;
     expectsColor: boolean = false;
+    expectsOutputFileName: boolean = false;
     fenArgumentProvided: boolean = false;
+    outputFileNameProvided: boolean = false;
     bufferSizeProvided: boolean = false;
     code: Shortint;
 begin
@@ -178,6 +178,19 @@ begin
                 Exit(false);
             end;
             expectsMoves := false;
+        end
+        else if (argument = '-o') then expectsOutputFileName := true
+        else if (expectsOutputFileName) then
+        begin
+            if Length(argument) <= 0 then
+            begin
+              ShowHelp;
+              writeln('ERROR: Output file name should not be empty');
+              Exit(false);
+            end;
+            cmdArgs.OutputFileName := argument;
+            expectsOutputFileName := false;
+            outputFileNameProvided := true;
         end
         else if argument = '--buffer-size' then expectsBufferSize := true
         else if expectsBufferSize then
@@ -222,6 +235,12 @@ begin
     begin
         ShowHelp;
         writeln('ERROR: Expected --fen <fen-notation-string>, but nothing is passed');
+        Exit(false);
+    end;
+    if expectsOutputFileName or not outputFileNameProvided then
+    begin
+        ShowHelp;
+        writeln('ERROR: Expected -o <output file path>, but nothing is passed');
         Exit(false);
     end;
     if expectsMoves then
@@ -376,22 +395,9 @@ begin
     end;
   end;
 end;
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-function GetOutputFileName(_inputFileName: string): string;
+procedure ClearBoard(var board: TBoard);
+var i,j:integer;
 begin
-  {
-  | TODO:
-  |  Implement this function to generate different output file name
-  |  based on input file name
-  }
-  Exit('moves_output.txt');
-end;
-procedure Initialize(var cmdArgs: TCmdArgs; var board: TBoard);
-var outputFile: text;
-    i, j: integer;
-begin
-  clrscr;
   for i:=1 to n do
   begin
     for j:=1 to n do
@@ -399,6 +405,12 @@ begin
       board[i,j] := 0;
     end;
   end;
+end;
+procedure Initialize(var cmdArgs: TCmdArgs; var board: TBoard);
+var outputFile: text;
+begin
+  clrscr;
+  ClearBoard(board);
   cmdArgs.Moves := 1;
   if not ParseArguments(cmdArgs) then Halt(1);
   if cmdArgs.ShowHelp then
@@ -406,18 +418,14 @@ begin
     ShowHelp;
     Halt(0);
   end;
-  z := cmdArgs.Moves;
   writeln('Moves: ', cmdArgs.Moves);
   writeln('Color: ', cmdArgs.Color);
   makeBoardWithFen(board, cmdArgs.fen);
   if cmdArgs.Color = PlayerColorBlack then ReverseColors(board);
   countOfPossibleMoves := 0;
-  buffermax := cmdArgs.BufferSize;
   if cmdArgs.A1IsAtTheLeftBottomCorner then orientation := -1
                                        else orientation := 1;
-  MoveMarking := cmdArgs.MovesGroupSize;
-  showblack := cmdArgs.ShowEnemyMoves;
-  assign(outputFile, GetOutputFileName(fName));
+  assign(outputFile, cmdArgs.OutputFileName);
   rewrite(outputFile);
   close(outputFile);
 end;
@@ -657,11 +665,11 @@ begin
   res := res + ' ' + getCoordStr(m.iEnd, m.jEnd);
   MoveToStr := res;
 end;
-procedure savebuf;
+procedure savebuf(var buffer: TBuffer; var buffercursor: longint; outputFileName: string);
 var f: text;
     i: longint;
 begin
-    assign(f, GetOutputFileName(fName));
+    assign(f, outputFileName);
     append(f);
     for i:=1 to buffercursor do
     begin
@@ -670,12 +678,19 @@ begin
     close(f);
     buffercursor := 0;
 end;
-procedure AddStrToBuffer(s: string);
+procedure AddStrToBuffer(var buffer: TBuffer; var buffercursor: longint; s: string);
 begin
   inc(buffercursor);
   buffer[buffercursor] := s;
 end;
-procedure saveMoves;
+procedure saveMoves(
+  outputFileName: string;
+  var buffer: TBuffer;
+  var buffercursor: longint;
+  buffermax: longint;
+  showEnemyMoves: boolean;
+  movesGroupSize: longint
+);
 var i: longint;
     s: string;
 begin
@@ -683,22 +698,22 @@ begin
   s:='';
   for i:=1 to CountOfMakedMoves do
   begin
-    if (i<=MoveMarking) then
+    if (i<=movesGroupSize) then
     begin
-      if (lastMakedMoves[i] <> MakedMoves[i]) then AddStrToBuffer('');
+      if (lastMakedMoves[i] <> MakedMoves[i]) then AddStrToBuffer(buffer, buffercursor, '');
     end;
   end;
   for i:=1 to CountOfMakedMoves do
   begin
-    if (i mod 2 = 1) or showblack then
+    if (i mod 2 = 1) or showEnemyMoves then
     begin
       s := s + MoveToSTr(makedmoves[i])+chr(9)
     end;
   end;
-  AddStrToBuffer(s);
-  if (buffercursor >=buffermax) then
+  AddStrToBuffer(buffer, buffercursor, s);
+  if (buffercursor >= buffermax) then
   begin
-    savebuf;
+    savebuf(buffer, buffercursor, outputFileName);
   end;
   lastMakedMoves := makedmoves;
 end;
@@ -956,7 +971,15 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure Solve(color, countOfMoves: longint);
+procedure Solve(
+  color, countOfMoves: longint;
+  var buffer: TBuffer;
+  var buffercursor: longint;
+  buffermax: longint;
+  movesGroupSize: longint;
+  showEnemyMoves: boolean;
+  outputFileName: string
+);
 var FirstPossibleMoveIndex: longint;
     LastPossibleMoveIndex: longint;
     i: longint;
@@ -987,7 +1010,7 @@ begin
           inc(cSolving);
           if (maxcountOfPossiblemoves < countofPossibleMoves) then maxcountofPossibleMoves := countOfPossibleMoves;
           Writeln('solved: ', cSolving, ' Solve: ', cVariants, '   max: ', maxcountofpossibleMoves);
-          Savemoves;
+          Savemoves(outputFileName, buffer, buffercursor, buffermax, showEnemyMoves, movesGroupSize);
 
       end else
       for i := LastPossibleMoveIndex downto FirstPossibleMoveIndex do
@@ -997,7 +1020,7 @@ begin
         writeln;
         ShowChessBoard(board);
         {$ENDIF}
-        Solve(-color, countOfMoves -1);
+        Solve(-color, countOfMoves -1, buffer, buffercursor, buffermax, movesGroupSize, showEnemyMoves, outputFileName);
         UndoMove(moves[i]);
         moves[i] := CreateMove(0,0,0,0,0);
       end;
@@ -1014,8 +1037,21 @@ Begin
   textcolor(7);
   textbackground(0);
   clrscr;
-  Solve(white,z*2);
-  savebuf;
+  Solve(
+    white,
+    cmdArgs.Moves*2,
+    buffer,
+    buffercursor,
+    cmdArgs.BufferSize,
+    cmdArgs.MovesGroupSize,
+    cmdArgs.ShowEnemyMoves,
+    cmdArgs.OutputFileName
+  );
+  savebuf(
+    buffer,
+    buffercursor,
+    cmdArgs.OutputFileName
+  );
   writeln('Solved: ',cSolving);
   writeln('Watched: ', cVariants);
   readkey;

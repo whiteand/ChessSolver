@@ -10,7 +10,7 @@ run *params: build
   @./target/chessSolver {{params}}
 
 r:
-  just run --fen r1b4k/b6p/2pp1r2/pp6/4P3/PBNP2R1/1PP3PP/7K --moves 1 --color white
+  just run --fen r1b4k/b6p/2pp1r2/pp6/4P3/PBNP2R1/1PP3PP/7K --moves 1 --color white -o ./moves_output.txt
 
 help:
   just run --help
