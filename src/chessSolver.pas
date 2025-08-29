@@ -49,7 +49,7 @@ var cmdArgs: TCmdArgs;
     countOfPossibleMoves: longint;
     isCheckToWhite, isCheckToBlack: boolean;
     MakedMoves: mas;
-    CountOfMakedMoves: longint =0;
+    countOfMakedMoves: longint =0;
     cVariants: int64 = 0;
     cSolving: int64 = 0;
     maxcountofpossibleMoves: int64 = 0;
@@ -701,14 +701,14 @@ var i: longint;
 begin
   i:=1;
   s:='';
-  for i:=1 to CountOfMakedMoves do
+  for i:=1 to countOfMakedMoves do
   begin
     if (i<=movesGroupSize) then
     begin
       if (lastMakedMoves[i] <> MakedMoves[i]) then AddStrToBuffer(buffer, buffercursor, '');
     end;
   end;
-  for i:=1 to CountOfMakedMoves do
+  for i:=1 to countOfMakedMoves do
   begin
     if (i mod 2 = 1) or showEnemyMoves then
     begin
@@ -770,7 +770,7 @@ begin
   begin
     board[iStart, jStart] := figureStart;
     board[iEnd, jEnd] := figureEnd;
-    dec(CountofMakedMoves);
+    dec(countOfMakedMoves);
   end;
 end;
 //-----------------------------------------------------------------------------
