@@ -636,12 +636,12 @@ begin
   Exit(chr(ord('a') + j - 1) + res)
 end;
 function MoveToStr(m:Move): string;
-var res: string;
 begin
-  res := figureToStr(m.figureStart);
-  res := res + ' ' + getCoordStr(m.iStart, m.jStart);
-  res := res + ' ' + getCoordStr(m.iEnd, m.jEnd);
-  MoveToStr := res;
+  Exit(
+    figureToStr(m.figureStart) + ' '
+    + getCoordStr(m.iStart, m.jStart) + ' '
+    + getCoordStr(m.iEnd, m.jEnd)
+  )
 end;
 procedure savebuf(var buffer: TBuffer; var buffercursor: longint; outputFileName: string);
 var f: text;
