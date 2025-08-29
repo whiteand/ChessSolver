@@ -15,7 +15,7 @@ type
         MovesGroupSize: integer;
         ShowEnemyMoves: boolean;
     end;
-    move = record
+    Move = record
       iStart: integer;
       iEnd: integer;
       jStart: integer;
@@ -23,7 +23,7 @@ type
       figureStart: integer;
       figureEnd: integer;
      end;
-     mas = array [1..1000] of move;
+     mas = array [1..1000] of Move;
 const n        = 8;
       peshka   = 1;
       loshad   = 2;
@@ -57,7 +57,7 @@ var cmdArgs: TCmdArgs;
     buffercursor: longint = 0;
     orientation: integer;
     lastMakedMoves: mas;
-operator =(a,b:move)z:boolean;
+operator =(a,b:Move)z:boolean;
 begin
   if (a.iStart = b.iStart) and
      (a.jStart = b.jStart) and
@@ -72,7 +72,7 @@ begin
      end;
 
 end;
-operator <>(a,b:move)z:boolean;
+operator <>(a,b:Move)z:boolean;
 begin
   z := not (a = b);
 end;
@@ -662,7 +662,7 @@ begin
   res := chr(ord('a') + j - 1) + res;
   getCoordStr := res;
 end;
-function MoveToStr(m:move): string;
+function MoveToStr(m:Move): string;
 var res: string;
 begin
   res := figureToStr(m.figureStart);
@@ -725,8 +725,14 @@ end;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function CreateMove(iStart, jStart, iEnd, jEnd, figureStart: longint): move;
-var res: move;
+function CreateMove(
+  iStart: longint;
+  jStart: longint;
+  iEnd: longint;
+  jEnd: longint;
+  figureStart: longint
+): Move;
+var res: Move;
 begin
   res.iStart := iStart;
   res.jStart := jStart;
@@ -738,7 +744,7 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure DoMove(var m: move);
+procedure DoMove(var m: Move);
 begin
   with m do
   begin
@@ -758,7 +764,7 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure UndoMove(var m: move);
+procedure UndoMove(var m: Move);
 begin
   with m do
   begin
@@ -779,7 +785,7 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure AddMove(m: move);
+procedure AddMove(m: Move);
 begin
   if (m.iEnd>=1) and (m.iEnd<=8) and (m.jEnd>=1) and (m.jEnd<=8) then
   begin
@@ -796,7 +802,7 @@ procedure AddMovesDist(i0,j0,dn,dm: longint);
 var i,j: longint;
     currentfigure: longint;
     current: longint;
-    curmov: move;
+    curmov: Move;
 begin
   i := i0 + dn;
   j := j0 + dm;
@@ -819,7 +825,7 @@ end;
 procedure AddAllPossibleMoves(color: longint);//TOWRITE
 var i,j: longint;
     curfig: longint; // Curent Figure
-    curmov: move;
+    curmov: Move;
 begin
   for i:=1 to n do
   begin
