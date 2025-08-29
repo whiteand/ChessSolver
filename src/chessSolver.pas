@@ -273,23 +273,19 @@ end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 procedure findKorol(color: longint; var i0,j0: longint);
-var founded: boolean;
-    i,j: longint;
+var i,j: longint;
 begin
-  founded := false;
   for i:=1 to n do
   begin
     for j:=1 to n do
     begin
-      if (board[i,j] = korol*color) then
+      if board[i,j] = korol*color then
       begin
-        founded :=true;
         i0:=i;
         j0:=j;
-        break;
+        Exit();
       end;
     end;
-    if (founded) then break;
   end;
 end;
 //-----------------------------------------------------------------------------
