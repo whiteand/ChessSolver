@@ -452,17 +452,14 @@ begin
 	i := i0 + dn;
 	j := j0 + dm;
 
-	current := getFigureOn(i,j);
-	if (dn <> 0) or (dm <> 0) then
-	begin
-		while (current = 0) and (i<=n) and (i>=1) and (j<=n) and (j>=1) do
-		begin
-			i := i + dn;
-			j := j + dm;
-			current := getFigureOn(i,j);
-		end;
-	end;
-	searchTo := current;
+  while (i<=n) and (i>=1) and (j<=n) and (j>=1) do
+  begin
+	  current := getFigureOn(i,j);
+    if current <> 0 then Exit(current);
+    i := i + dn;
+    j := j + dm;
+  end;
+  Exit(0);
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
