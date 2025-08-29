@@ -589,28 +589,14 @@ end;
 function isUnderAttackBy(colorOfattacker, i0, j0: longint): boolean;
 var res: boolean;
 begin
-   res := isUnderAttackByFigure(peshka * colorOfattacker, i0, j0);
-   if (not res) then
-   begin
-     res := isUnderAttackByFigure(loshad * colorOfattacker, i0, j0);
-     if (not res) then
-     begin
-       res := isUnderAttackByFigure(officer * colorOfattacker, i0, j0);
-       if (not res) then
-       begin
-         res := isUnderAttackByFigure(ladya * colorOfattacker, i0, j0);
-         if (not res) then
-         begin
-           res := isUnderAttackByFigure(ferz * colorOfattacker, i0, j0);
-           if (not res) then
-           begin
-             res := isUnderAttackByFigure(korol * colorOfattacker, i0, j0);
-           end;
-         end;
-       end;
-     end;
-   end;
-   isUnderAttackBy := res;
+   if isUnderAttackByFigure(peshka * colorOfattacker, i0, j0) then Exit(true);
+   if isUnderAttackByFigure(loshad * colorOfattacker, i0, j0) then Exit(true);
+   if isUnderAttackByFigure(officer * colorOfattacker, i0, j0) then Exit(true);
+   if isUnderAttackByFigure(ladya * colorOfattacker, i0, j0) then Exit(true);
+   if isUnderAttackByFigure(ferz * colorOfattacker, i0, j0) then Exit(true);
+   if isUnderAttackByFigure(korol * colorOfattacker, i0, j0) then Exit(true);
+   
+   Exit(false)
 end;
 procedure saveBoard;
 var f: text;
