@@ -16,8 +16,13 @@ type
         ShowEnemyMoves: boolean;
     end;
     move = record
-              iStart, iEnd, jStart, jEnd, figureStart, figureEnd: integer;
-            end;
+      iStart: integer;
+      iEnd: integer;
+      jStart: integer;
+      jEnd: integer;
+      figureStart: integer;
+      figureEnd: integer;
+     end;
      mas = array [1..1000] of move;
 const n        = 8;
       peshka   = 1;
