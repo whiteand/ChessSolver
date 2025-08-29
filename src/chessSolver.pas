@@ -633,8 +633,7 @@ function getCoordStr(i,j: longint): string;
 var res: string;
 begin
   str(i, res);
-  res := chr(ord('a') + j - 1) + res;
-  getCoordStr := res;
+  Exit(chr(ord('a') + j - 1) + res)
 end;
 function MoveToStr(m:Move): string;
 var res: string;
