@@ -429,9 +429,9 @@ end;
 //-----------------------------------------------------------------------------
 function colorOf(f: integer): integer;
 begin
-  if (f>0) then colorOf := 1
-           else if (f<0) then colorOf := -1
-                         else colorOf := 0;
+  if f > 0 then Exit(1)
+  else if f < 0 then Exit(-1)
+  else Exit(0)
 end;
 function getFigureOn(i,j: longint): longint;
 begin
