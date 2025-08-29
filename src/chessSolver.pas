@@ -59,18 +59,13 @@ var cmdArgs: TCmdArgs;
     lastMakedMoves: mas;
 operator =(a,b:Move)z:boolean;
 begin
-  if (a.iStart = b.iStart) and
+  Exit(
+    (a.iStart = b.iStart) and
      (a.jStart = b.jStart) and
      (a.iEnd = b.iEnd) and
      (a.jEnd = b.jEnd) and
-     (a.figureStart = b.figureStart) then
-     begin
-       z:=true;
-     end else
-     begin
-       z:=false;
-     end;
-
+     (a.figureStart = b.figureStart)
+  );
 end;
 operator <>(a,b:Move)z:boolean;
 begin
