@@ -12,6 +12,12 @@ run *params: build
 r:
   just run --fen r1b4k/b6p/2pp1r2/pp6/4P3/PBNP2R1/1PP3PP/7K --moves 1 --color white -o ./moves_output.txt
 
+test:
+  rm -f ./target/test
+  rm -f ./target/test.o
+  fpc -FE./target -gw3 ./src/test.pas
+  @./target/test
+
 help:
   just run --help
 
