@@ -5,20 +5,20 @@ type
   record
     name: string;
   end;
-{$macro on}
+
+{$MACRO ON}
 {$define ELEM_T:=TPerson}
 {$define VEC_T:=TPersons}
 {$define VEC_POP:=TPersons_Pop}
 {$define VEC_PUSH:=TPersons_Push}
-{$i ./vector.inc}
-{$undef $ELEM_T}
-{$undef $VEC_T}
-{$undef $VEC_POP}
+{$i ./vector.pas}
 var person: TPerson;
     persons: TPersons;
     i: longint;
     a, b: longint;
+{$MACRO ON}
 {$define inc_a_b:=a := a + b}
+
 begin
   // person := TPersons_Pop(persons);
   // writeln('Popped.name = ', person.name);

@@ -28,3 +28,5 @@ begin
   VEC_POP := xs.items[xs.length-1];
   Dec(xs.length);
 end;
+
+{$undef ELEM_T}{$undef VEC_T}{$undef VEC_POP}{$undef VEC_PUSH}
