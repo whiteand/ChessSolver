@@ -5,48 +5,38 @@ type
   record
     name: string;
   end;
-  
-  TPersons =
-  record
-    items: array of TPerson;
-    length: longint
-  end;
-procedure PushPerson(person: TPerson; var persons: TPersons);
-begin
-  if Length(persons.items) <= persons.length then
-  begin
-    if persons.length = 0
-      then SetLength(persons.items, 4)
-      else SetLength(persons.items, persons.length * 2);
-  end;
-  persons.items[persons.length] := person;
-  Inc(persons.length);
-end;
-function PopPerson(var persons: TPersons): TPerson;
-begin
-  assert(persons.length > 0, 'Cannot pop element from empty array');
-  PopPerson := persons.items[persons.length-1];
-  Dec(persons.length);
-end;
-
+{$macro on}
+{$define ELEM_T:=TPerson}
+{$define VEC_T:=TPersons}
+{$define VEC_POP:=TPersons_Pop}
+{$define VEC_PUSH:=TPersons_Push}
+{$i ./vector.inc}
+{$undef $ELEM_T}
+{$undef $VEC_T}
+{$undef $VEC_POP}
 var person: TPerson;
     persons: TPersons;
     i: longint;
+    a, b: longint;
+{$define inc_a_b:=a := a + b}
 begin
-  person := PopPerson(persons);
-  writeln('Popped.name = ', person.name);
-
+  // person := TPersons_Pop(persons);
+  // writeln('Popped.name = ', person.name);
+  a := 1;
+  b := 2;
+  inc_a_b;
+  writeln('a = ', a);
   person.name := 'Andrii';
-  PushPerson(person, persons);
+  TPersons_Push(person, persons);
   person.name := 'Vasylyna';
-  PushPerson(person, persons);
+  TPersons_Push(person, persons);
   person.name := 'Volodymyr';
-  PushPerson(person, persons);
+  TPersons_Push(person, persons);
   person.name := 'Mykola';
-  PushPerson(person, persons);
+  TPersons_Push(person, persons);
   
   person.name := 'Vasyl';
-  PushPerson(person, persons);
+  TPersons_Push(person, persons);
   writeln('Capacity = ', Length(persons.items));
   writeln('Length = ', persons.length);
   

@@ -1,12 +1,9 @@
 cmd.bat
 SomeTests
 in.txt
-chesssolver.bak
-chesssolver.o
 fp___.err
 fp___.out
 **/.DS_Store
-chessSolver
 moves_*.txt
 target/
 LINKS.md
