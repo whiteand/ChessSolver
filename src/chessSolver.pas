@@ -42,7 +42,15 @@ const n        = 8;
       isLog = false;
 
 type TBoard = array [1..n, 1..n] of shortint;
-type TBuffer = array [1..20000] of string;
+
+{$macro on}
+{$define VECTOR_ELEM_TYPE := string}
+{$define VECTOR_TYPE := TStrings}
+{$define VECTOR_PUSH := TStringsPush}
+{$define VECTOR_POP := TStringsPop}
+{$i ./vector.pas}
+{$macro off}
+
 var cmdArgs: TCmdArgs;
     board: TBoard;
     moves: mas;
@@ -53,8 +61,7 @@ var cmdArgs: TCmdArgs;
     cVariants: int64 = 0;
     cSolving: int64 = 0;
     maxcountofpossibleMoves: int64 = 0;
-    buffer: TBuffer;
-    buffercursor: longint = 0;
+    buffer: TStrings;
     orientation: integer;
     lastMakedMoves: mas;
 operator =(a,b:Move)z:boolean;
@@ -587,7 +594,6 @@ end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 function isUnderAttackBy(colorOfattacker, i0, j0: longint): boolean;
-var res: boolean;
 begin
    if isUnderAttackByFigure(peshka * colorOfattacker, i0, j0) then Exit(true);
    if isUnderAttackByFigure(loshad * colorOfattacker, i0, j0) then Exit(true);
@@ -643,28 +649,22 @@ begin
     + getCoordStr(m.iEnd, m.jEnd)
   )
 end;
-procedure savebuf(var buffer: TBuffer; var buffercursor: longint; outputFileName: string);
+procedure SaveBuf(var buffer: TStrings; outputFileName: string);
 var f: text;
     i: longint;
 begin
     assign(f, outputFileName);
     append(f);
-    for i:=1 to buffercursor do
+    for i:=0 to buffer.length-1 do
     begin
-      writeln(f,buffer[i]);
+      writeln(f,buffer.items[i]);
     end;
     close(f);
-    buffercursor := 0;
-end;
-procedure AddStrToBuffer(var buffer: TBuffer; var buffercursor: longint; s: string);
-begin
-  inc(buffercursor);
-  buffer[buffercursor] := s;
+    buffer.length := 0
 end;
 procedure saveMoves(
   outputFileName: string;
-  var buffer: TBuffer;
-  var buffercursor: longint;
+  var buffer: TStrings;
   buffermax: longint;
   showEnemyMoves: boolean;
   movesGroupSize: longint
@@ -678,7 +678,7 @@ begin
   begin
     if (i<=movesGroupSize) then
     begin
-      if (lastMakedMoves[i] <> MakedMoves[i]) then AddStrToBuffer(buffer, buffercursor, '');
+      if (lastMakedMoves[i] <> MakedMoves[i]) then TStringsPush('', buffer);
     end;
   end;
   for i:=1 to countOfMakedMoves do
@@ -688,10 +688,10 @@ begin
       s := s + MoveToSTr(makedmoves[i])+chr(9)
     end;
   end;
-  AddStrToBuffer(buffer, buffercursor, s);
-  if (buffercursor >= buffermax) then
+  TStringsPush(s, buffer);
+  if (buffer.length >= buffermax) then
   begin
-    savebuf(buffer, buffercursor, outputFileName);
+    SaveBuf(buffer, outputFileName);
   end;
   lastMakedMoves := makedmoves;
 end;
@@ -957,8 +957,7 @@ end;
 //-----------------------------------------------------------------------------
 procedure Solve(
   color, countOfMoves: longint;
-  var buffer: TBuffer;
-  var buffercursor: longint;
+  var buffer: TStrings;
   buffermax: longint;
   movesGroupSize: longint;
   showEnemyMoves: boolean;
@@ -994,7 +993,7 @@ begin
           inc(cSolving);
           if (maxcountOfPossiblemoves < countofPossibleMoves) then maxcountofPossibleMoves := countOfPossibleMoves;
           Writeln('solved: ', cSolving, ' Solve: ', cVariants, '   max: ', maxcountofpossibleMoves);
-          Savemoves(outputFileName, buffer, buffercursor, buffermax, showEnemyMoves, movesGroupSize);
+          SaveMoves(outputFileName, buffer, buffermax, showEnemyMoves, movesGroupSize);
 
       end else
       for i := LastPossibleMoveIndex downto FirstPossibleMoveIndex do
@@ -1004,7 +1003,7 @@ begin
         writeln;
         ShowChessBoard(board);
         {$ENDIF}
-        Solve(-color, countOfMoves -1, buffer, buffercursor, buffermax, movesGroupSize, showEnemyMoves, outputFileName);
+        Solve(-color, countOfMoves -1, buffer, buffermax, movesGroupSize, showEnemyMoves, outputFileName);
         UndoMove(moves[i]);
         moves[i] := CreateMove(0,0,0,0,0);
       end;
@@ -1025,15 +1024,13 @@ Begin
     white,
     cmdArgs.Moves*2,
     buffer,
-    buffercursor,
     cmdArgs.BufferSize,
     cmdArgs.MovesGroupSize,
     cmdArgs.ShowEnemyMoves,
     cmdArgs.OutputFileName
   );
-  savebuf(
+  SaveBuf(
     buffer,
-    buffercursor,
     cmdArgs.OutputFileName
   );
   writeln('Solved: ',cSolving);
