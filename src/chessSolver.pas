@@ -23,7 +23,6 @@ type
       figureStart: integer;
       figureEnd: integer;
      end;
-     mas = array [1..1000] of Move;
 const n        = 8;
       peshka   = 1;
       loshad   = 2;
@@ -51,19 +50,25 @@ type TBoard = array [1..n, 1..n] of shortint;
 {$i ./vector.pas}
 {$macro off}
 
+{$macro on}
+{$define VECTOR_ELEM_TYPE := Move}
+{$define VECTOR_TYPE := TMoves}
+{$define VECTOR_PUSH := TMovesPush}
+{$define VECTOR_POP := TMovesPop}
+{$i ./vector.pas}
+{$macro off}
+
 var cmdArgs: TCmdArgs;
     board: TBoard;
-    moves: mas;
-    countOfPossibleMoves: longint;
+    moves: TMoves;
     isCheckToWhite, isCheckToBlack: boolean;
-    MakedMoves: mas;
-    countOfMakedMoves: longint =0;
+    makedMoves: TMoves;
     cVariants: int64 = 0;
     cSolving: int64 = 0;
     maxcountofpossibleMoves: int64 = 0;
     buffer: TStrings;
     orientation: integer;
-    lastMakedMoves: mas;
+    lastSavedMoves: TMoves;
 operator =(a,b:Move)z:boolean;
 begin
   Exit(
@@ -425,7 +430,6 @@ begin
   writeln('Color: ', cmdArgs.Color);
   makeBoardWithFen(board, cmdArgs.fen);
   if cmdArgs.Color = PlayerColorBlack then ReverseColors(board);
-  countOfPossibleMoves := 0;
   if cmdArgs.A1IsAtTheLeftBottomCorner then orientation := -1
                                        else orientation := 1;
   assign(outputFile, cmdArgs.OutputFileName);
@@ -674,18 +678,18 @@ var i: longint;
 begin
   i:=1;
   s:='';
-  for i:=1 to countOfMakedMoves do
+  for i:=0 to makedMoves.length-1 do
   begin
     if (i<=movesGroupSize) then
     begin
-      if (lastMakedMoves[i] <> MakedMoves[i]) then TStringsPush('', buffer);
+      if (lastSavedMoves.length > i) and (lastSavedMoves.items[i] <> makedMoves.items[i]) then TStringsPush('', buffer);
     end;
   end;
-  for i:=1 to countOfMakedMoves do
+  for i:=0 to makedMoves.length-1 do
   begin
-    if (i mod 2 = 1) or showEnemyMoves then
+    if (i mod 2 = 0) or showEnemyMoves then
     begin
-      s := s + MoveToSTr(makedmoves[i])+chr(9)
+      s := s + MoveToSTr(makedmoves.items[i])+chr(9)
     end;
   end;
   TStringsPush(s, buffer);
@@ -693,7 +697,11 @@ begin
   begin
     SaveBuf(buffer, outputFileName);
   end;
-  lastMakedMoves := makedmoves;
+  lastSavedMoves.length := 0;
+  for i := 0 to makedMoves.length-1 do
+  begin
+    TMovesPush(makedMoves.items[i], lastSavedMoves);
+  end;
 end;
 
 //-----------------------------------------------------------------------------
@@ -731,8 +739,7 @@ begin
     end else board[iEnd, jEnd] := figureStart;
 
     board[iStart, jStart] := 0;
-    inc(countOfMakedMoves);
-    MakedMoves[countOfMakedMoves]:=m;
+    TMovesPush(m, makedMoves)
   end;
 end;
 //-----------------------------------------------------------------------------
@@ -743,7 +750,7 @@ begin
   begin
     board[iStart, jStart] := figureStart;
     board[iEnd, jEnd] := figureEnd;
-    dec(countOfMakedMoves);
+    TMovesPop(makedMoves);
   end;
 end;
 //-----------------------------------------------------------------------------
@@ -765,8 +772,7 @@ begin
     doMove(m);
     if (not isCheckTo(colorOf(m.figureStart))) and (colorOf(m.figurestart)<>colorOf(m.figureEnd)) then
     begin
-      inc(countOfPossibleMoves);
-      moves[countOfPossibleMoves] := m;
+      TMovesPush(m, moves);
     end;
     UndoMove(m);
   end;
@@ -969,47 +975,45 @@ var FirstPossibleMoveIndex: longint;
     checkWhite, checkBlack: boolean;
     isOk: boolean;
 begin
-  if (countOfMoves > 0) then
+  if (countOfMoves <= 0) then Exit();
+
+  inc(cVariants);
+  FirstPossibleMoveIndex := moves.length + 1;
+
+  isOk:= true;
+
+  checkWhite := isCheckTo(white);
+  checkBlack := isCheckTo(black);
+
+  if (checkWhite) and (isCheckToWhite) then isOk := false;
+  if (checkBlack) and (isCheckToBlack) then isOK := false;
+
+  if (isOk) then
   begin
-    inc(cVariants);
-    FirstPossibleMoveIndex := countOfPossibleMoves + 1;
-
-    isOk:= true;
-
-    checkWhite := isCheckTo(white);
-    checkBlack := isCheckTo(black);
-
-    if (checkWhite) and (isCheckToWhite) then isOk := false;
-    if (checkBlack) and (isCheckToBlack) then isOK := false;
-
-    if (isOk) then
+    isCheckToWhite := checkWhite;
+    isCheckToBlack := checkBlack;
+    AddAllPossibleMoves(color);
+    LastPossibleMoveIndex := moves.length-1;
+    if (LastPossibleMoveIndex < FirstPossibleMoveIndex) and (isCheckTo(black)) then
     begin
-      isCheckToWhite := checkWhite;
-      isCheckToBlack := checkBlack;
-      AddAllPossibleMoves(color);
-      LastPossibleMoveIndex := countOfPossibleMoves;
-      if (LastPossibleMoveIndex < FirstPossibleMoveIndex) and (isCheckTo(black)) then
-      begin
-          inc(cSolving);
-          if (maxcountOfPossiblemoves < countofPossibleMoves) then maxcountofPossibleMoves := countOfPossibleMoves;
-          Writeln('solved: ', cSolving, ' Solve: ', cVariants, '   max: ', maxcountofpossibleMoves);
-          SaveMoves(outputFileName, buffer, buffermax, showEnemyMoves, movesGroupSize);
+        inc(cSolving);
+        if (maxcountOfPossiblemoves < moves.length) then maxcountofPossibleMoves := moves.length;
+        Writeln('solved: ', cSolving, ' Solve: ', cVariants, '   max: ', maxcountofpossibleMoves);
+        SaveMoves(outputFileName, buffer, buffermax, showEnemyMoves, movesGroupSize);
 
-      end else
-      for i := LastPossibleMoveIndex downto FirstPossibleMoveIndex do
-      begin
-        DoMove(moves[i]);
-        {$IFDEF SHOULD_LOG}
-        writeln;
-        ShowChessBoard(board);
-        {$ENDIF}
-        Solve(-color, countOfMoves -1, buffer, buffermax, movesGroupSize, showEnemyMoves, outputFileName);
-        UndoMove(moves[i]);
-        moves[i] := CreateMove(0,0,0,0,0);
-      end;
-      countOfPossibleMoves := FirstPossibleMoveIndex - 1;
-
+    end else
+    for i := LastPossibleMoveIndex downto FirstPossibleMoveIndex do
+    begin
+      DoMove(moves.items[i]);
+      {$IFDEF SHOULD_LOG}
+      writeln;
+      ShowChessBoard(board);
+      {$ENDIF}
+      Solve(-color, countOfMoves -1, buffer, buffermax, movesGroupSize, showEnemyMoves, outputFileName);
+      UndoMove(moves.items[i]);
     end;
+    moves.length := FirstPossibleMoveIndex - 1;
+
   end;
 end;
 
