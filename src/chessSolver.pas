@@ -3,6 +3,14 @@ Program ChessSolver;
 uses crt;
 type
     PlayerColor = (PlayerColorWhite, PlayerColorBlack);
+    ChessFigure = (
+      Pawn,
+      Knight,
+      Bishop,
+      Rook,
+      Queen,
+      King
+    );
     TCmdArgs =
     record
         ShowHelp: Boolean;
@@ -11,7 +19,6 @@ type
         Color: PlayerColor;
         OutputFileName: string;
         BufferSize: longint;
-        A1IsAtTheLeftBottomCorner: boolean;
         MovesGroupSize: integer;
         ShowEnemyMoves: boolean;
     end;
@@ -37,6 +44,8 @@ const BOARD_SIZE   = 8;
       BLACK_ROOK   = -WHITE_ROOK;
       BLACK_QUEEN  = -WHITE_QUEEN;
       BLACK_KING   = -WHITE_KING;
+      WHITE_PAWN_MOVE_DIRECTION = -1;
+      EMPTY_CELL   = 0;
       white    =  1;
       black    = -1;
       isLog = false;
@@ -68,7 +77,6 @@ var cmdArgs: TCmdArgs;
     cSolving: int64 = 0;
     maxcountofpossibleMoves: int64 = 0;
     buffer: TStrings;
-    orientation: integer;
     lastSavedMoves: TMoves;
 operator =(a,b:Move)z:boolean;
 begin
@@ -80,6 +88,14 @@ begin
      (a.figureStart = b.figureStart)
   );
 end;
+
+function OppositeColor(color: PlayerColor): PlayerColor;
+begin
+  if color = PlayerColorWhite
+    then Exit(PlayerColorBlack)
+    else Exit(PlayerColorWhite)
+end;
+
 operator <>(a,b:Move)z:boolean;
 begin
   z := not (a = b);
@@ -129,7 +145,7 @@ end;
 
 procedure ShowHelp;
 begin
-    WriteLn('Usage: ChessSolver --fen <fen-notation> -o <output-file-path> [--color <white|black>] [--moves <moves>] [--buffer-size <buffer size>] [--a1-at-top-right] [--moves-group-size <group-moves-size>] [--show-enemy-moves]');
+    WriteLn('Usage: ChessSolver --fen <fen-notation> -o <output-file-path> [--color <white|black>] [--moves <moves>] [--buffer-size <buffer size>] [--moves-group-size <group-moves-size>] [--show-enemy-moves]');
     WriteLn('Example:');
     WriteLn('  ChessSolver --fen r1b4k/b6p/2pp1r2/pp6/4P3/PBNP2R1/1PP3PP/7K --moves 1 --color white');
     WriteLn('Options:');
@@ -138,7 +154,6 @@ begin
     WriteLn('  --color            - Color of the player that should win. Possible values: white | black. Default is white');
     WriteLn('  --moves            - Number of expected moves for checkmate to be found');
     WriteLn('  --buffer-size      - No one knows what is this parameter, TBD. Default to 10000');
-    WriteLn('  --a1-at-top-right  - Should show A1 at the top right corner. Defaults to false');
     WriteLn('  --moves-group-size - How many moves should be grouped together. Defaults to 0 (means no grouping).');
     WriteLn('  --show-enemy-moves - Shows enemy moves in the output. Defaults to false.');
 end;
@@ -156,7 +171,6 @@ var i: integer;
     bufferSizeProvided: boolean = false;
     code: Shortint;
 begin
-    args.A1IsAtTheLeftBottomCorner := true;
     args.Color := PlayerColorWhite;
 
     for i := 1 to ParamCount() do
@@ -229,7 +243,6 @@ begin
             end;
             expectsColor := false
         end
-        else if argument = '--a1-at-top-right' then args.A1IsAtTheLeftBottomCorner := false
         else if argument = '--show-enemy-moves' then args.ShowEnemyMoves := true
         else if argument = '--moves-group-size' then expectsMovesGroupSize := true
         else if expectsMovesGroupSize then
@@ -283,16 +296,32 @@ begin
     if not bufferSizeProvided then args.BufferSize := 10000;
     Exit(true);
 end;
+function GetFigureValue(figure: ChessFigure; color: PlayerColor): shortint;
+var sign: shortint;
+begin
+  if color = PlayerColorWhite
+    then sign := 1
+    else sign := -1;
+  case figure of
+    Pawn: Exit(WHITE_PAWN * sign);
+    Knight: Exit(WHITE_KNIGHT * sign);
+    Bishop: Exit(WHITE_BISHOP * sign);
+    Rook: Exit(WHITE_ROOK * sign);
+    Queen: Exit(WHITE_QUEEN * sign);
+    King: Exit(WHITE_KING * sign);
+  end;
+end;
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure FindKing(color: longint; var i0,j0: longint);
+procedure FindKing(color: PlayerColor; var i0,j0: longint);
 var i,j: longint;
 begin
   for i:=1 to BOARD_SIZE do
   begin
     for j:=1 to BOARD_SIZE do
     begin
-      if board[i,j] = WHITE_KING*color then
+      if board[i,j] = GetFigureValue(King, color) then
       begin
         i0:=i;
         j0:=j;
@@ -429,20 +458,18 @@ begin
   WriteLn('Moves: ', cmdArgs.Moves);
   WriteLn('Color: ', cmdArgs.Color);
   MakeBoardWithFen(board, cmdArgs.fen);
-  if cmdArgs.Color = PlayerColorBlack then ReverseColors(board);
-  if cmdArgs.A1IsAtTheLeftBottomCorner then orientation := -1
-                                       else orientation := 1;
+  if cmdArgs.Color = PlayerColorBlack then ReverseColors(board);     
   Assign(outputFile, cmdArgs.OutputFileName);
   Rewrite(outputFile);
   Close(outputFile);
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function ColorOf(f: integer): integer;
+function ColorOf(f: integer): PlayerColor;
 begin
-  if f > 0 then Exit(1)
-  else if f < 0 then Exit(-1)
-  else Exit(0)
+  assert(f <> 0, 'Cannot get color of the empty cell');
+  if f > 0 then Exit(PlayerColorWhite)
+  else if f < 0 then Exit(PlayerColorBlack)
 end;
 function GetFigureOn(i,j: longint): longint;
 begin
@@ -474,13 +501,16 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function IsUnderAttackByFigure(figure, i0, j0: longint): boolean;
+function IsUnderAttackByFigure(attackerFigure: ChessFigure; attackerColor: PlayerColor; i0, j0: longint): boolean;
 var res: boolean;
+    figure: shortint;
 begin
   res := false;
+  figure := GetFigureValue(attackerFigure, attackerColor);
+  // TODO: Rewrite this logic to not use abs(figure)
   if (abs(figure) = WHITE_PAWN) then
   begin
-    if (figure*orientation > 0) then
+    if (figure*WHITE_PAWN_MOVE_DIRECTION > 0) then
     begin
     	if (GetFigureOn(i0+1,j0+1) = figure) or (GetFigureOn(i0+1,j0-1) = figure) then
     	begin
@@ -597,14 +627,14 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function IsUnderAttackBy(colorOfattacker, i0, j0: longint): boolean;
+function IsUnderAttackBy(colorOfAttacker: PlayerColor; i0, j0: longint): boolean;
 begin
-   if IsUnderAttackByFigure(WHITE_PAWN * colorOfattacker, i0, j0) then Exit(true);
-   if IsUnderAttackByFigure(WHITE_KNIGHT * colorOfattacker, i0, j0) then Exit(true);
-   if IsUnderAttackByFigure(WHITE_BISHOP * colorOfattacker, i0, j0) then Exit(true);
-   if IsUnderAttackByFigure(WHITE_ROOK * colorOfattacker, i0, j0) then Exit(true);
-   if IsUnderAttackByFigure(WHITE_QUEEN * colorOfattacker, i0, j0) then Exit(true);
-   if IsUnderAttackByFigure(WHITE_KING * colorOfattacker, i0, j0) then Exit(true);
+   if IsUnderAttackByFigure(Pawn, colorOfAttacker, i0, j0) then Exit(true);
+   if IsUnderAttackByFigure(Knight, colorOfAttacker, i0, j0) then Exit(true);
+   if IsUnderAttackByFigure(Bishop, colorOfAttacker, i0, j0) then Exit(true);
+   if IsUnderAttackByFigure(Rook, colorOfAttacker, i0, j0) then Exit(true);
+   if IsUnderAttackByFigure(Queen, colorOfAttacker, i0, j0) then Exit(true);
+   if IsUnderAttackByFigure(King, colorOfAttacker, i0, j0) then Exit(true);
    
    Exit(false)
 end;
@@ -730,12 +760,12 @@ begin
   with m do
   begin
     figureEnd := board[iEnd, jEnd];
-    if (iEnd = 1) and (figureStart*orientation = WHITE_PAWN) then
+    if (iEnd = 1) and (figureStart*WHITE_PAWN_MOVE_DIRECTION = WHITE_PAWN) then
     begin
-      board[iEnd,jEnd] := WHITE_QUEEN*ColorOf(figureStart);
-    end else if (iEnd = 8) and (figureStart*orientation = BLACK_PAWN) then
+      board[iEnd,jEnd] := GetFigureValue(Queen, ColorOf(figureStart));
+    end else if (iEnd = 8) and (figureStart*WHITE_PAWN_MOVE_DIRECTION = BLACK_PAWN) then
     begin
-      board[iEnd,jEnd] := WHITE_QUEEN*ColorOf(figureStart);
+      board[iEnd,jEnd] := GetFigureValue(Queen,ColorOf(figureStart));
     end else board[iEnd, jEnd] := figureStart;
 
     board[iStart, jStart] := 0;
@@ -755,22 +785,30 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function isCheckTo(color: longint):boolean; //TOWRITE
+function IsCheckTo(color: PlayerColor):boolean; //TOWRITE
 var res: boolean;
     i,j: longint;
 begin
   FindKing(color,i,j);
-  res := IsUnderAttackBy(-color, i,j);
-  isCheckTo := res;
+  res := IsUnderAttackBy(OppositeColor(color), i,j);
+  IsCheckTo := res;
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 procedure AddMove(m: Move);
+var isCheckAfterMove: boolean;
+    isMoveToEmptyCell: boolean;
+    isOppositeColorAttacked: boolean;
 begin
   if (m.iEnd>=1) and (m.iEnd<=8) and (m.jEnd>=1) and (m.jEnd<=8) then
   begin
     doMove(m);
-    if (not isCheckTo(ColorOf(m.figureStart))) and (ColorOf(m.figurestart)<>ColorOf(m.figureEnd)) then
+    
+    isCheckAfterMove := IsCheckTo(ColorOf(m.figureStart));
+    isMoveToEmptyCell := m.figureEnd = EMPTY_CELL;
+    isOppositeColorAttacked := (not isMoveToEmptyCell) and (ColorOf(m.figurestart)<>ColorOf(m.figureEnd)); 
+
+    if (not isCheckAfterMove) and (isMoveToEmptyCell or isOppositeColorAttacked) then
     begin
       TMovesPush(m, moves);
     end;
@@ -801,10 +839,37 @@ begin
     end;
   end;
 end;
-procedure AddAllPossibleMoves(color: longint);//TOWRITE
+function HasEnemy(
+  myColor: PlayerColor;
+  i, j: shortint;
+  var board: TBoard
+): boolean;
+begin
+ HasEnemy := (i >= 1)
+   and (i <= BOARD_SIZE)
+   and (j >= 1)
+   and (j <= BOARD_SIZE)
+   and (board[i,j] <> EMPTY_CELL)
+   and (ColorOf(board[i,j]) <> myColor)
+end;
+function HasEnemyOrEmpty(
+  myColor: PlayerColor;
+  i, j: shortint;
+  var board: TBoard
+): boolean;
+begin
+ HasEnemyOrEmpty := (i >= 1)
+   and (i <= BOARD_SIZE)
+   and (j >= 1)
+   and (j <= BOARD_SIZE)
+   and ((board[i,j] = EMPTY_CELL) or (ColorOf(board[i,j]) <> myColor))
+end;
+
+procedure AddAllPossibleMoves(color: PlayerColor);
 var i,j: longint;
     curfig: longint; // Curent Figure
     curmov: Move;
+    currentPawnMoveDirection: shortint;
 begin
   for i:=1 to BOARD_SIZE do
   begin
@@ -812,102 +877,113 @@ begin
     begin
       {TODO: Replace board[i,j]*color to function "HasPieceOfColor(i,j,color)"}
       {TODO: decrease nestedness}
-      if (board[i,j]*color > 0) then
+      if (board[i,j] <> EMPTY_CELL) and (ColorOf(board[i,j]) = color) then
       begin
         curfig := board[i,j];
         if (abs(curfig) = WHITE_PAWN) then
         begin
-          if (color*orientation = white) then
+          // WHITE_PAWN_MOVE_DIRECTION = -1
+          // color = 1
+          //  color = white <- isA1AtTheRightTopCorner
+          // color = -1
+
+          if ColorOf(curfig) = PlayerColorWhite then
           begin
-            if (GetFigureOn(i-1,j-1)*color<0) then
-            begin
-              curmov := CreateMove(i,j,i-1,j-1, curfig);
-              AddMove(curMov);
-            end;
-            if (GetFigureOn(i-1,j+1)*color<0) then
-            begin
-              curmov := CreateMove(i,j,i-1,j+1, curfig);
-              AddMove(curMov);
-            end;
-            if (GetFigureOn(i-1,j) = 0) then
-            begin
-              curmov := CreateMove(i,j,i-1,j, curfig);
-              AddMove(curMov);
-            end;
-            if (i = 7) then
-            begin
-              if (GetFigureOn(i-2,j) = 0) then
-              begin
-                curmov := CreateMove(i,j,i-2,j, curfig);
-                AddMove(curMov);
-              end;
-            end;
-          end else
+            currentPawnMoveDirection := WHITE_PAWN_MOVE_DIRECTION;
+          end else 
           begin
-            if (GetFigureOn(i+1,j-1)*color<0) then
-            begin
-              curmov := CreateMove(i,j,i+1,j-1, curfig);
+            currentPawnMoveDirection := -WHITE_PAWN_MOVE_DIRECTION;
+          end;
+
+          if HasEnemy(
+             color,
+             i + currentPawnMoveDirection, j - 1,
+             board
+          ) then
+          begin
+              curmov := CreateMove(
+                i,j,
+                i + currentPawnMoveDirection, j - 1,
+                curfig
+              );
               AddMove(curMov);
-            end;
-            if (GetFigureOn(i+1,j+1)*color<0) then
-            begin
-              curmov := CreateMove(i,j,i+1,j+1, curfig);
+          end;
+          if HasEnemy(
+             color,
+             i + currentPawnMoveDirection, j + 1,
+             board
+          ) then
+          begin
+              curmov := CreateMove(
+                i,j,
+                i + currentPawnMoveDirection, j + 1,
+                curfig
+              );
               AddMove(curMov);
-            end;
-            if (GetFigureOn(i+1,j) = 0) then
+          end;
+          if board[i + currentPawnMoveDirection, j] = EMPTY_CELL then
+          begin
+            curmov := CreateMove(i,j,i+currentPawnMoveDirection,j, curfig);
+            AddMove(curMov);
+          end;
+          if (color = PlayerColorWhite) and (i = BOARD_SIZE - 1) then
+          begin
+            if (GetFigureOn(i + WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
+              and (GetFigureOn(i + 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
             begin
-              curmov := CreateMove(i,j,i+1,j, curfig);
-              AddMove(curMov);
-            end;
-            if (i = 2) then
-            begin
-              if (GetFigureOn(i+2,j) = 0) then
-              begin
-                curmov := CreateMove(i,j,i+2,j, curfig);
+                curmov := CreateMove(i,j,i + 2 * WHITE_PAWN_MOVE_DIRECTION, j, curfig);
                 AddMove(curMov);
-              end;
+            end;
+          end;
+          if (color = PlayerColorBlack) and (i = 2) then
+          begin
+            if (GetFigureOn(i - WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
+              and (GetFigureOn(i - 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
+            begin
+                curmov := CreateMove(i,j,i - 2 * WHITE_PAWN_MOVE_DIRECTION,j, curfig);
+                AddMove(curMov);
             end;
           end;
         end else
         if (abs(curfig) = WHITE_KNIGHT) then //-----------------------------------------------------Loshad
         begin
-          if (GetFigureOn(i-2,j-1)*color <= 0) then
+          if HasEnemyOrEmpty(color, i-2,j-1, board) then
           begin
             curmov := CreateMove(i,j,i-2,j-1, curfig);
             AddMove(curMov);
           end;
-          if (GetFigureOn(i-2,j+1)*color <= 0) then
+          if HasEnemyOrEmpty(color, i-2,j+1, board) then
           begin
             curmov := CreateMove(i,j,i-2,j+1, curfig);
             AddMove(curMov);
           end;
-          if (GetFigureOn(i+2,j-1)*color <= 0) then
+          if HasEnemyOrEmpty(color, i+2,j-1, board) then
           begin
             curmov := CreateMove(i,j,i+2,j-1, curfig);
             AddMove(curMov);
           end;
-          if (GetFigureOn(i+2,j+1)*color <= 0) then
+          if HasEnemyOrEmpty(color,i+2,j+1,board) then
           begin
             curmov := CreateMove(i,j,i+2,j+1, curfig);
             AddMove(curMov);
           end;
 
-          if (GetFigureOn(i-1,j-2)*color <= 0) then
+          if (HasEnemyOrEmpty(color,i-1,j-2,board)) then
           begin
             curmov := CreateMove(i,j,i-1,j-2, curfig);
             AddMove(curMov);
           end;
-          if (GetFigureOn(i-1,j+2)*color <= 0) then
+          if HasEnemyOrEmpty(color, i-1, j+2, board) then
           begin
             curmov := CreateMove(i,j,i-1,j+2, curfig);
             AddMove(curMov);
           end;
-          if (GetFigureOn(i+1,j-2)*color <= 0) then
+          if HasEnemyOrEmpty(color, i+1,j-2, board) then
           begin
             curmov := CreateMove(i,j,i+1,j-2, curfig);
             AddMove(curMov);
           end;
-          if (GetFigureOn(i+1,j+2)*color <= 0) then
+          if HasEnemyOrEmpty(color, i+1,j+2, board) then
           begin
             curmov := CreateMove(i,j,i+1,j+2, curfig);
             AddMove(curMov);
@@ -964,7 +1040,8 @@ end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 procedure Solve(
-  color, countOfMoves: longint;
+  color: PlayerColor;
+  countOfMoves: longint;
   var buffer: TStrings;
   buffermax: longint;
   movesGroupSize: longint;
@@ -984,8 +1061,8 @@ begin
 
   isOk:= true;
 
-  checkWhite := isCheckTo(white);
-  checkBlack := isCheckTo(black);
+  checkWhite := IsCheckTo(PlayerColorWhite);
+  checkBlack := IsCheckTo(PlayerColorBlack);
 
   {
   | If current state didn't fixed previously set check
@@ -1002,7 +1079,7 @@ begin
     previousMoveWasCheckToBlacks := checkBlack;
     AddAllPossibleMoves(color);
     lastPossibleMoveIndex := moves.length-1;
-    if (lastPossibleMoveIndex < firstPossibleMoveIndex) and (isCheckTo(black)) then
+    if (lastPossibleMoveIndex < firstPossibleMoveIndex) and (IsCheckTo(PlayerColorBlack)) then
     begin
         Inc(cSolving);
         if (maxcountOfPossiblemoves < moves.length) then maxcountofPossibleMoves := moves.length;
@@ -1017,7 +1094,15 @@ begin
       WriteLn;
       ShowChessBoard(board);
       {$ENDIF}
-      Solve(-color, countOfMoves -1, buffer, buffermax, movesGroupSize, showEnemyMoves, outputFileName);
+      Solve(
+        OppositeColor(color),
+        countOfMoves -1,
+        buffer,
+        buffermax,
+        movesGroupSize,
+        showEnemyMoves,
+        outputFileName
+      );
       UndoMove(moves.items[i]);
     end;
     moves.length := firstPossibleMoveIndex - 1;
@@ -1033,7 +1118,7 @@ Begin
   textbackground(0);
   clrscr;
   Solve(
-    white,
+    PlayerColorWhite,
     cmdArgs.Moves*2,
     buffer,
     cmdArgs.BufferSize,
