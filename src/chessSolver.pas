@@ -28,14 +28,14 @@ const n          = 8;
       WHITE_PAWN   = 1;
       WHITE_KNIGHT = 2; 
       WHITE_BISHOP = 3;
-      WHITE_ROOK        = 4;
-      ferz         = 5; // queen
+      WHITE_ROOK   = 4;
+      WHITE_QUEEN  = 5;
       korol        = 6; // king
       BLACK_PAWN   = -WHITE_PAWN;
       BLACK_KNIGHT   = -WHITE_KNIGHT;
       BLACK_BISHOP  = -WHITE_BISHOP;
       BLACK_ROOK    = -WHITE_ROOK;
-      bferz     = -ferz;
+      BLACK_QUEEN     = -WHITE_QUEEN;
       bkorol    = -korol;
       white    =  1;
       black    = -1;
@@ -117,8 +117,8 @@ begin
         WHITE_KNIGHT: begin Write('♞ '); end;
         WHITE_BISHOP: begin Write('♝ '); end;
         BLACK_BISHOP: begin TextColor(Blue); Write('♗ '); TextColor(COLOR_WHITE) end;
-        ferz: begin Write('♛ '); end;
-        bferz: begin TextColor(Blue); Write('♕ '); TextColor(COLOR_WHITE) end;
+        WHITE_QUEEN: begin Write('♛ '); end;
+        BLACK_QUEEN: begin TextColor(Blue); Write('♕ '); TextColor(COLOR_WHITE) end;
         korol: begin Write('♚ '); end;
         bkorol: begin TextColor(Blue); Write('♔ '); TextColor(COLOR_WHITE) end;
           else Write('?'); end;
@@ -550,7 +550,7 @@ begin
   	end;
 
   end else
-  if (abs(figure) = ferz) then
+  if (abs(figure) = WHITE_QUEEN) then
   begin
   	//Search
   	if (SearchTo(i0,j0,-1,-1) = figure) then
@@ -603,7 +603,7 @@ begin
    if IsUnderAttackByFigure(WHITE_KNIGHT * colorOfattacker, i0, j0) then Exit(true);
    if IsUnderAttackByFigure(WHITE_BISHOP * colorOfattacker, i0, j0) then Exit(true);
    if IsUnderAttackByFigure(WHITE_ROOK * colorOfattacker, i0, j0) then Exit(true);
-   if IsUnderAttackByFigure(ferz * colorOfattacker, i0, j0) then Exit(true);
+   if IsUnderAttackByFigure(WHITE_QUEEN * colorOfattacker, i0, j0) then Exit(true);
    if IsUnderAttackByFigure(korol * colorOfattacker, i0, j0) then Exit(true);
    
    Exit(false)
@@ -633,7 +633,7 @@ begin
   if (abs(f) = WHITE_KNIGHT) then res:= ' knight';
   if (abs(f) = WHITE_BISHOP) then res:= ' bishop';
   if (abs(f) = WHITE_ROOK) then res:= ' rook';
-  if (abs(f) = ferz) then res:= ' ferz';
+  if (abs(f) = WHITE_QUEEN) then res:= ' queen';
   if (abs(f) = korol) then res:= ' korol';
   if (f<0) then res[1] := 'b'
            else res[1] := 'w';
@@ -732,10 +732,10 @@ begin
     figureEnd := board[iEnd, jEnd];
     if (iEnd = 1) and (figureStart*orientation = WHITE_PAWN) then
     begin
-      board[iEnd,jEnd] := ferz*ColorOf(figureStart);
+      board[iEnd,jEnd] := WHITE_QUEEN*ColorOf(figureStart);
     end else if (iEnd = 8) and (figureStart*orientation = BLACK_PAWN) then
     begin
-      board[iEnd,jEnd] := ferz*ColorOf(figureStart);
+      board[iEnd,jEnd] := WHITE_QUEEN*ColorOf(figureStart);
     end else board[iEnd, jEnd] := figureStart;
 
     board[iStart, jStart] := 0;
@@ -927,7 +927,7 @@ begin
           AddMovesDist(i,j, 1, 0);
           AddMovesDist(i,j, 0,-1);
         end else
-        if (abs(curfig) = ferz) then
+        if (abs(curfig) = WHITE_QUEEN) then
         begin
           AddMovesDist(i,j,-1,-1);
           AddMovesDist(i,j,-1, 1);
