@@ -24,14 +24,14 @@ type
       figureStart: integer;
       figureEnd: integer;
      end;
-const n        = 8;
-      peshka   = 1;
-      loshad   = 2;
-      officer  = 3;
-      ladya    = 4;
-      ferz     = 5;
-      korol    = 6;
-      bpeshka   = -peshka;
+const n          = 8;
+      WHITE_PAWN = 1;
+      loshad     = 2; // knight
+      officer    = 3; // bishop
+      ladya      = 4; // rook
+      ferz       = 5; // queen
+      korol      = 6; // king
+      BLACK_PAWN   = -WHITE_PAWN;
       bloshad   = -loshad;
       bofficer  = -officer;
       bladya    = -ladya;
@@ -109,8 +109,8 @@ begin
           else Write('▪ ');
         TextColor(COLOR_WHITE)
       end else case cell of 
-        bpeshka: begin TextColor(Blue); Write('♙ '); TextColor(COLOR_WHITE) end;
-        peshka: begin Write('♟ '); end;
+        BLACK_PAWN: begin TextColor(Blue); Write('♙ '); TextColor(COLOR_WHITE) end;
+        WHITE_PAWN: begin Write('♟ '); end;
         bladya: begin TextColor(Blue); Write('♖ '); TextColor(COLOR_WHITE) end;
         ladya: begin Write('♜ '); end;
         bloshad: begin TextColor(Blue); Write('♘ '); TextColor(COLOR_WHITE) end;
@@ -478,7 +478,7 @@ function IsUnderAttackByFigure(figure, i0, j0: longint): boolean;
 var res: boolean;
 begin
   res := false;
-  if (abs(figure) = peshka) then
+  if (abs(figure) = WHITE_PAWN) then
   begin
     if (figure*orientation > 0) then
     begin
@@ -599,7 +599,7 @@ end;
 //-----------------------------------------------------------------------------
 function IsUnderAttackBy(colorOfattacker, i0, j0: longint): boolean;
 begin
-   if IsUnderAttackByFigure(peshka * colorOfattacker, i0, j0) then Exit(true);
+   if IsUnderAttackByFigure(WHITE_PAWN * colorOfattacker, i0, j0) then Exit(true);
    if IsUnderAttackByFigure(loshad * colorOfattacker, i0, j0) then Exit(true);
    if IsUnderAttackByFigure(officer * colorOfattacker, i0, j0) then Exit(true);
    if IsUnderAttackByFigure(ladya * colorOfattacker, i0, j0) then Exit(true);
@@ -629,7 +629,7 @@ function FigureToStr(f: longint): string;
 var res: string;
 begin
   res:= ' ';
-  if (abs(f) = peshka) then res:= ' peshka';
+  if (abs(f) = WHITE_PAWN) then res:= ' pawn';
   if (abs(f) = loshad) then res:= ' loshad';
   if (abs(f) = officer) then res:= ' officer';
   if (abs(f) = ladya) then res:= ' ladya';
@@ -730,10 +730,10 @@ begin
   with m do
   begin
     figureEnd := board[iEnd, jEnd];
-    if (iEnd = 1) and (figureStart*orientation = peshka) then
+    if (iEnd = 1) and (figureStart*orientation = WHITE_PAWN) then
     begin
       board[iEnd,jEnd] := ferz*ColorOf(figureStart);
-    end else if (iEnd = 8) and (figureStart*orientation = bpeshka) then
+    end else if (iEnd = 8) and (figureStart*orientation = BLACK_PAWN) then
     begin
       board[iEnd,jEnd] := ferz*ColorOf(figureStart);
     end else board[iEnd, jEnd] := figureStart;
@@ -815,7 +815,7 @@ begin
       if (board[i,j]*color > 0) then
       begin
         curfig := board[i,j];
-        if (abs(curfig) = peshka) then
+        if (abs(curfig) = WHITE_PAWN) then
         begin
           if (color*orientation = white) then
           begin
