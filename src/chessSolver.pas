@@ -24,7 +24,7 @@ type
       figureStart: integer;
       figureEnd: integer;
      end;
-const n          = 8;
+const BOARD_SIZE   = 8;
       WHITE_PAWN   = 1;
       WHITE_KNIGHT = 2; 
       WHITE_BISHOP = 3;
@@ -41,7 +41,7 @@ const n          = 8;
       black    = -1;
       isLog = false;
 
-type TBoard = array [1..n, 1..n] of shortint;
+type TBoard = array [1..BOARD_SIZE, 1..BOARD_SIZE] of shortint;
 
 {$macro on}
 {$define VECTOR_ELEM_TYPE := string}
@@ -96,9 +96,9 @@ var r: integer;
     c: integer;
     cell: longint;
 begin
-  for r := 1 to n do
+  for r := 1 to BOARD_SIZE do
   begin
-    for c := 1 to n do
+    for c := 1 to BOARD_SIZE do
     begin
       cell := board[r, c];
       if (cell = 0) then
@@ -288,9 +288,9 @@ end;
 procedure FindKing(color: longint; var i0,j0: longint);
 var i,j: longint;
 begin
-  for i:=1 to n do
+  for i:=1 to BOARD_SIZE do
   begin
-    for j:=1 to n do
+    for j:=1 to BOARD_SIZE do
     begin
       if board[i,j] = WHITE_KING*color then
       begin
@@ -406,9 +406,9 @@ end;
 procedure ClearBoard(var board: TBoard);
 var i,j:integer;
 begin
-  for i:=1 to n do
+  for i:=1 to BOARD_SIZE do
   begin
-    for j:=1 to n do
+    for j:=1 to BOARD_SIZE do
     begin
       board[i,j] := 0;
     end;
@@ -446,7 +446,7 @@ begin
 end;
 function GetFigureOn(i,j: longint): longint;
 begin
-  if (i>=1) and (i<=n) and (j>=1) and (j<=n) then
+  if (i>=1) and (i<=BOARD_SIZE) and (j>=1) and (j<=BOARD_SIZE) then
   begin
     GetFigureOn := board[i,j];
   end else
@@ -463,7 +463,7 @@ begin
 	i := i0 + dn;
 	j := j0 + dm;
 
-  while (i<=n) and (i>=1) and (j<=n) and (j>=1) do
+  while (i<=BOARD_SIZE) and (i>=1) and (j<=BOARD_SIZE) and (j>=1) do
   begin
 	  current := GetFigureOn(i,j);
     if current <> 0 then Exit(current);
@@ -614,9 +614,9 @@ var f: text;
 begin
   Assign(f,'out.txt');
   Append(f);
-  for i:=1 to n do
+  for i:=1 to BOARD_SIZE do
   begin
-    for j:=1 to n do
+    for j:=1 to BOARD_SIZE do
     begin
       Write(f, board[i,j]:3);
     end;
@@ -789,7 +789,7 @@ begin
   current := GetFigureOn(i,j);
   if (dn <> 0) or (dm <> 0) then
   begin
-    while (current*currentFigure <= 0) and (i<=n) and (i>=1) and (j<=n) and (j>=1) do
+    while (current*currentFigure <= 0) and (i<=BOARD_SIZE) and (i>=1) and (j<=BOARD_SIZE) and (j>=1) do
     begin
       curmov := CreateMove(i0,j0,i,j, currentFigure);
       AddMove(curmov);
@@ -806,9 +806,9 @@ var i,j: longint;
     curfig: longint; // Curent Figure
     curmov: Move;
 begin
-  for i:=1 to n do
+  for i:=1 to BOARD_SIZE do
   begin
-    for j:=1 to n do
+    for j:=1 to BOARD_SIZE do
     begin
       {TODO: Replace board[i,j]*color to function "HasPieceOfColor(i,j,color)"}
       {TODO: decrease nestedness}
