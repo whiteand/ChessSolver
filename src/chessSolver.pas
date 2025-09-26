@@ -30,13 +30,13 @@ const n          = 8;
       WHITE_BISHOP = 3;
       WHITE_ROOK   = 4;
       WHITE_QUEEN  = 5;
-      korol        = 6; // king
+      WHITE_KING   = 6;
       BLACK_PAWN   = -WHITE_PAWN;
-      BLACK_KNIGHT   = -WHITE_KNIGHT;
-      BLACK_BISHOP  = -WHITE_BISHOP;
-      BLACK_ROOK    = -WHITE_ROOK;
-      BLACK_QUEEN     = -WHITE_QUEEN;
-      bkorol    = -korol;
+      BLACK_KNIGHT = -WHITE_KNIGHT;
+      BLACK_BISHOP = -WHITE_BISHOP;
+      BLACK_ROOK   = -WHITE_ROOK;
+      BLACK_QUEEN  = -WHITE_QUEEN;
+      BLACK_KING   = -WHITE_KING;
       white    =  1;
       black    = -1;
       isLog = false;
@@ -119,8 +119,8 @@ begin
         BLACK_BISHOP: begin TextColor(Blue); Write('♗ '); TextColor(COLOR_WHITE) end;
         WHITE_QUEEN: begin Write('♛ '); end;
         BLACK_QUEEN: begin TextColor(Blue); Write('♕ '); TextColor(COLOR_WHITE) end;
-        korol: begin Write('♚ '); end;
-        bkorol: begin TextColor(Blue); Write('♔ '); TextColor(COLOR_WHITE) end;
+        WHITE_KING: begin Write('♚ '); end;
+        BLACK_KING: begin TextColor(Blue); Write('♔ '); TextColor(COLOR_WHITE) end;
           else Write('?'); end;
     end;
     WriteLn;
@@ -292,7 +292,7 @@ begin
   begin
     for j:=1 to n do
     begin
-      if board[i,j] = korol*color then
+      if board[i,j] = WHITE_KING*color then
       begin
         i0:=i;
         j0:=j;
@@ -579,7 +579,7 @@ begin
   		res := true;
   	end;
   end else
-  if (abs(figure) = korol) then
+  if (abs(figure) = WHITE_KING) then
   begin
   	if ((GetFigureOn(i0-1,j0-1) = figure) or
   	    (GetFigureOn(i0-1,j0) = figure) or
@@ -604,7 +604,7 @@ begin
    if IsUnderAttackByFigure(WHITE_BISHOP * colorOfattacker, i0, j0) then Exit(true);
    if IsUnderAttackByFigure(WHITE_ROOK * colorOfattacker, i0, j0) then Exit(true);
    if IsUnderAttackByFigure(WHITE_QUEEN * colorOfattacker, i0, j0) then Exit(true);
-   if IsUnderAttackByFigure(korol * colorOfattacker, i0, j0) then Exit(true);
+   if IsUnderAttackByFigure(WHITE_KING * colorOfattacker, i0, j0) then Exit(true);
    
    Exit(false)
 end;
@@ -634,7 +634,7 @@ begin
   if (abs(f) = WHITE_BISHOP) then res:= ' bishop';
   if (abs(f) = WHITE_ROOK) then res:= ' rook';
   if (abs(f) = WHITE_QUEEN) then res:= ' queen';
-  if (abs(f) = korol) then res:= ' korol';
+  if (abs(f) = WHITE_KING) then res:= ' king';
   if (f<0) then res[1] := 'b'
            else res[1] := 'w';
   FigureToStr:=res;
@@ -938,7 +938,7 @@ begin
           AddMovesDist(i,j, 1, 0);
           AddMovesDist(i,j, 0,-1);
         end else
-        if (abs(curfig) = korol) then
+        if (abs(curfig) = WHITE_KING) then
         begin
           curmov := CreateMove(i,j,i-1,j-1, curfig);
           AddMove(curmov);
