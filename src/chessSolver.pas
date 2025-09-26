@@ -25,14 +25,14 @@ type
       figureEnd: integer;
      end;
 const n          = 8;
-      WHITE_PAWN = 1;
-      loshad     = 2; // knight
-      officer    = 3; // bishop
-      ladya      = 4; // rook
-      ferz       = 5; // queen
-      korol      = 6; // king
+      WHITE_PAWN   = 1;
+      WHITE_KNIGHT = 2; 
+      officer      = 3; // bishop
+      ladya        = 4; // rook
+      ferz         = 5; // queen
+      korol        = 6; // king
       BLACK_PAWN   = -WHITE_PAWN;
-      bloshad   = -loshad;
+      BLACK_KNIGHT   = -WHITE_KNIGHT;
       bofficer  = -officer;
       bladya    = -ladya;
       bferz     = -ferz;
@@ -113,8 +113,8 @@ begin
         WHITE_PAWN: begin Write('♟ '); end;
         bladya: begin TextColor(Blue); Write('♖ '); TextColor(COLOR_WHITE) end;
         ladya: begin Write('♜ '); end;
-        bloshad: begin TextColor(Blue); Write('♘ '); TextColor(COLOR_WHITE) end;
-        loshad: begin Write('♞ '); end;
+        BLACK_KNIGHT: begin TextColor(Blue); Write('♘ '); TextColor(COLOR_WHITE) end;
+        WHITE_KNIGHT: begin Write('♞ '); end;
         officer: begin Write('♝ '); end;
         bofficer: begin TextColor(Blue); Write('♗ '); TextColor(COLOR_WHITE) end;
         ferz: begin Write('♛ '); end;
@@ -494,7 +494,7 @@ begin
     	end;
     end;
   end else
-  if (abs(figure) = loshad) then
+  if (abs(figure) = WHITE_KNIGHT) then
   begin
   	if ((GetFigureOn(i0-2,j0-1) = figure) or
                 (GetFigureOn(i0-2,j0+1) = figure) or
@@ -600,7 +600,7 @@ end;
 function IsUnderAttackBy(colorOfattacker, i0, j0: longint): boolean;
 begin
    if IsUnderAttackByFigure(WHITE_PAWN * colorOfattacker, i0, j0) then Exit(true);
-   if IsUnderAttackByFigure(loshad * colorOfattacker, i0, j0) then Exit(true);
+   if IsUnderAttackByFigure(WHITE_KNIGHT * colorOfattacker, i0, j0) then Exit(true);
    if IsUnderAttackByFigure(officer * colorOfattacker, i0, j0) then Exit(true);
    if IsUnderAttackByFigure(ladya * colorOfattacker, i0, j0) then Exit(true);
    if IsUnderAttackByFigure(ferz * colorOfattacker, i0, j0) then Exit(true);
@@ -630,7 +630,7 @@ var res: string;
 begin
   res:= ' ';
   if (abs(f) = WHITE_PAWN) then res:= ' pawn';
-  if (abs(f) = loshad) then res:= ' loshad';
+  if (abs(f) = WHITE_KNIGHT) then res:= ' loshad';
   if (abs(f) = officer) then res:= ' officer';
   if (abs(f) = ladya) then res:= ' ladya';
   if (abs(f) = ferz) then res:= ' ferz';
@@ -869,7 +869,7 @@ begin
             end;
           end;
         end else
-        if (abs(curfig) = loshad) then //-----------------------------------------------------Loshad
+        if (abs(curfig) = WHITE_KNIGHT) then //-----------------------------------------------------Loshad
         begin
           if (GetFigureOn(i-2,j-1)*color <= 0) then
           begin
