@@ -27,13 +27,13 @@ type
 const n          = 8;
       WHITE_PAWN   = 1;
       WHITE_KNIGHT = 2; 
-      officer      = 3; // bishop
+      WHITE_BISHOP      = 3;
       ladya        = 4; // rook
       ferz         = 5; // queen
       korol        = 6; // king
       BLACK_PAWN   = -WHITE_PAWN;
       BLACK_KNIGHT   = -WHITE_KNIGHT;
-      bofficer  = -officer;
+      BLACK_BISHOP  = -WHITE_BISHOP;
       bladya    = -ladya;
       bferz     = -ferz;
       bkorol    = -korol;
@@ -115,8 +115,8 @@ begin
         ladya: begin Write('♜ '); end;
         BLACK_KNIGHT: begin TextColor(Blue); Write('♘ '); TextColor(COLOR_WHITE) end;
         WHITE_KNIGHT: begin Write('♞ '); end;
-        officer: begin Write('♝ '); end;
-        bofficer: begin TextColor(Blue); Write('♗ '); TextColor(COLOR_WHITE) end;
+        WHITE_BISHOP: begin Write('♝ '); end;
+        BLACK_BISHOP: begin TextColor(Blue); Write('♗ '); TextColor(COLOR_WHITE) end;
         ferz: begin Write('♛ '); end;
         bferz: begin TextColor(Blue); Write('♕ '); TextColor(COLOR_WHITE) end;
         korol: begin Write('♚ '); end;
@@ -508,7 +508,7 @@ begin
   		res := true;
   	end
   end else
-  if (abs(figure) = officer) then
+  if (abs(figure) = WHITE_BISHOP) then
   begin
   	if (SearchTo(i0,j0,-1,-1) = figure) then
   	begin
@@ -601,7 +601,7 @@ function IsUnderAttackBy(colorOfattacker, i0, j0: longint): boolean;
 begin
    if IsUnderAttackByFigure(WHITE_PAWN * colorOfattacker, i0, j0) then Exit(true);
    if IsUnderAttackByFigure(WHITE_KNIGHT * colorOfattacker, i0, j0) then Exit(true);
-   if IsUnderAttackByFigure(officer * colorOfattacker, i0, j0) then Exit(true);
+   if IsUnderAttackByFigure(WHITE_BISHOP * colorOfattacker, i0, j0) then Exit(true);
    if IsUnderAttackByFigure(ladya * colorOfattacker, i0, j0) then Exit(true);
    if IsUnderAttackByFigure(ferz * colorOfattacker, i0, j0) then Exit(true);
    if IsUnderAttackByFigure(korol * colorOfattacker, i0, j0) then Exit(true);
@@ -630,8 +630,8 @@ var res: string;
 begin
   res:= ' ';
   if (abs(f) = WHITE_PAWN) then res:= ' pawn';
-  if (abs(f) = WHITE_KNIGHT) then res:= ' loshad';
-  if (abs(f) = officer) then res:= ' officer';
+  if (abs(f) = WHITE_KNIGHT) then res:= ' knight';
+  if (abs(f) = WHITE_BISHOP) then res:= ' bishop';
   if (abs(f) = ladya) then res:= ' ladya';
   if (abs(f) = ferz) then res:= ' ferz';
   if (abs(f) = korol) then res:= ' korol';
@@ -913,7 +913,7 @@ begin
             AddMove(curMov);
           end;
         end else
-        if (abs(curfig) = officer) then
+        if (abs(curfig) = WHITE_BISHOP) then
         begin
           AddMovesDist(i,j,-1,-1);
           AddMovesDist(i,j,-1, 1);
