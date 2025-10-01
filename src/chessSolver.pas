@@ -935,6 +935,7 @@ begin
   end;
 end;
 
+
 procedure AddAllPossibleKnightMoves(var board: TBoard; i, j: shortint);
 var curfig: shortint;
     color: PlayerColor;
@@ -980,6 +981,14 @@ begin
   end;
 end;
 
+procedure AddAllPossibleBishopMoves(var board: TBoard; i, j: shortint);
+begin
+  AddMovesDist(i,j,-1,-1);
+  AddMovesDist(i,j,-1, 1);
+  AddMovesDist(i,j, 1,-1);
+  AddMovesDist(i,j, 1, 1);
+end;
+
 procedure AddAllPossibleMoves(color: PlayerColor);
 var i,j: longint;
     curfig: longint; // Curent Figure
@@ -1006,10 +1015,7 @@ begin
       end else
       if (abs(curfig) = WHITE_BISHOP) then
       begin
-        AddMovesDist(i,j,-1,-1);
-        AddMovesDist(i,j,-1, 1);
-        AddMovesDist(i,j, 1,-1);
-        AddMovesDist(i,j, 1, 1);
+        AddAllPossibleBishopMoves(board, i, j);
       end else
       if (abs(curfig) = WHITE_ROOK) then
       begin
