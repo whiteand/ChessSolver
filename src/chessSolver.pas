@@ -870,6 +870,71 @@ begin
   HasPieceOfColor := (board[i,j] <> EMPTY_CELL) and (ColorOf(board[i,j]) = color);
 end;
 
+procedure AddAllPossiblePawnMoves(var board: TBoard; i, j: shortint);
+var color: PlayerColor;
+    curfig: shortint;
+    currentPawnMoveDirection: shortint;
+begin
+  curfig := board[i,j];
+
+  assert(abs(curfig) = WHITE_PAWN, 'invariant broken');
+  
+  color := ColorOf(curfig);
+
+  if ColorOf(curfig) = PlayerColorWhite then
+  begin
+    currentPawnMoveDirection := WHITE_PAWN_MOVE_DIRECTION;
+  end else 
+  begin
+    currentPawnMoveDirection := -WHITE_PAWN_MOVE_DIRECTION;
+  end;
+
+  if HasEnemy(
+      color,
+      i + currentPawnMoveDirection, j - 1,
+      board
+  ) then
+  begin
+      AddMove(CreateMove(
+        i,j,
+        i + currentPawnMoveDirection, j - 1,
+        curfig
+      ));
+  end;
+  if HasEnemy(
+      color,
+      i + currentPawnMoveDirection, j + 1,
+      board
+  ) then
+  begin
+      AddMove(CreateMove(
+        i,j,
+        i + currentPawnMoveDirection, j + 1,
+        curfig
+      ));
+  end;
+  if board[i + currentPawnMoveDirection, j] = EMPTY_CELL then
+  begin
+    AddMove(CreateMove(i,j,i+currentPawnMoveDirection,j, curfig));
+  end;
+  if (color = PlayerColorWhite) and (i = BOARD_SIZE - 1) then
+  begin
+    if (GetFigureOn(i + WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
+      and (GetFigureOn(i + 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
+    begin
+        AddMove(CreateMove(i,j,i + 2 * WHITE_PAWN_MOVE_DIRECTION, j, curfig));
+    end;
+  end;
+  if (color = PlayerColorBlack) and (i = 2) then
+  begin
+    if (GetFigureOn(i - WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
+      and (GetFigureOn(i - 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
+    begin
+        AddMove(CreateMove(i,j,i - 2 * WHITE_PAWN_MOVE_DIRECTION,j, curfig));
+    end;
+  end;
+end;
+
 procedure AddAllPossibleMoves(color: PlayerColor);
 var i,j: longint;
     curfig: longint; // Curent Figure
@@ -884,71 +949,11 @@ begin
       {TODO: decrease nestedness}
       if not HasPieceOfColor(board, i, j, color) then continue;
 
+
       curfig := board[i,j];
       if (abs(curfig) = WHITE_PAWN) then
       begin
-        // WHITE_PAWN_MOVE_DIRECTION = -1
-        // color = 1
-        //  color = white <- isA1AtTheRightTopCorner
-        // color = -1
-
-        if ColorOf(curfig) = PlayerColorWhite then
-        begin
-          currentPawnMoveDirection := WHITE_PAWN_MOVE_DIRECTION;
-        end else 
-        begin
-          currentPawnMoveDirection := -WHITE_PAWN_MOVE_DIRECTION;
-        end;
-
-        if HasEnemy(
-            color,
-            i + currentPawnMoveDirection, j - 1,
-            board
-        ) then
-        begin
-            curmov := CreateMove(
-              i,j,
-              i + currentPawnMoveDirection, j - 1,
-              curfig
-            );
-            AddMove(curMov);
-        end;
-        if HasEnemy(
-            color,
-            i + currentPawnMoveDirection, j + 1,
-            board
-        ) then
-        begin
-            curmov := CreateMove(
-              i,j,
-              i + currentPawnMoveDirection, j + 1,
-              curfig
-            );
-            AddMove(curMov);
-        end;
-        if board[i + currentPawnMoveDirection, j] = EMPTY_CELL then
-        begin
-          curmov := CreateMove(i,j,i+currentPawnMoveDirection,j, curfig);
-          AddMove(curMov);
-        end;
-        if (color = PlayerColorWhite) and (i = BOARD_SIZE - 1) then
-        begin
-          if (GetFigureOn(i + WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
-            and (GetFigureOn(i + 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
-          begin
-              curmov := CreateMove(i,j,i + 2 * WHITE_PAWN_MOVE_DIRECTION, j, curfig);
-              AddMove(curMov);
-          end;
-        end;
-        if (color = PlayerColorBlack) and (i = 2) then
-        begin
-          if (GetFigureOn(i - WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
-            and (GetFigureOn(i - 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
-          begin
-              curmov := CreateMove(i,j,i - 2 * WHITE_PAWN_MOVE_DIRECTION,j, curfig);
-              AddMove(curMov);
-          end;
-        end;
+        AddAllPossiblePawnMoves(board, i, j);
       end else
       if (abs(curfig) = WHITE_KNIGHT) then //-----------------------------------------------------Loshad
       begin
