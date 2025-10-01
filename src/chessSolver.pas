@@ -760,12 +760,15 @@ begin
   with m do
   begin
     figureEnd := board[iEnd, jEnd];
-    if (iEnd = 1) and (figureStart*WHITE_PAWN_MOVE_DIRECTION = WHITE_PAWN) then
+    // TODO: Make a replacement logic to be defined
+    // by the move structure, not by default.
+    // It is possible for me to want to transform pawn into a knight or a rook.
+    if (iEnd = 1) and (figureStart = WHITE_PAWN) then
     begin
-      board[iEnd,jEnd] := GetFigureValue(Queen, ColorOf(figureStart));
-    end else if (iEnd = 8) and (figureStart*WHITE_PAWN_MOVE_DIRECTION = BLACK_PAWN) then
+      board[iEnd,jEnd] := GetFigureValue(Queen, PlayerColorWhite);
+    end else if (iEnd = 8) and (figureStart = BLACK_PAWN) then
     begin
-      board[iEnd,jEnd] := GetFigureValue(Queen,ColorOf(figureStart));
+      board[iEnd,jEnd] := GetFigureValue(Queen,PlayerColorBlack);
     end else board[iEnd, jEnd] := figureStart;
 
     board[iStart, jStart] := 0;
@@ -794,6 +797,9 @@ begin
   IsCheckTo := res;
 end;
 //-----------------------------------------------------------------------------
+// Adds move into moves
+// if the move is valid (figure moves into empty cell or attacks an enemy)
+// AND king is not under attack after the move
 //-----------------------------------------------------------------------------
 procedure AddMove(m: Move);
 var isCheckAfterMove: boolean;
@@ -802,7 +808,7 @@ var isCheckAfterMove: boolean;
 begin
   if (m.iEnd>=1) and (m.iEnd<=8) and (m.jEnd>=1) and (m.jEnd<=8) then
   begin
-    doMove(m);
+    DoMove(m);
     
     isCheckAfterMove := IsCheckTo(ColorOf(m.figureStart));
     isMoveToEmptyCell := m.figureEnd = EMPTY_CELL;
@@ -1007,6 +1013,18 @@ begin
   AddMovesDist(i,j, 1, 0);
   AddMovesDist(i,j, 0,-1);
 end;
+procedure AddAllPossibleKingMoves(var board: TBoard; i, j: shortint);
+begin
+  assert(abs(board[i,j]) = WHITE_KING, 'invariant failed');
+  AddMove(CreateMove(i,j,i-1,j-1, board[i,j]));
+  AddMove(CreateMove(i,j,i-1,j,   board[i,j]));
+  AddMove(CreateMove(i,j,i-1,j+1, board[i,j]));
+  AddMove(CreateMove(i,j,i,  j-1, board[i,j]));
+  AddMove(CreateMove(i,j,i,  j+1, board[i,j]));
+  AddMove(CreateMove(i,j,i+1,j-1, board[i,j]));
+  AddMove(CreateMove(i,j,i+1,j,   board[i,j]));
+  AddMove(CreateMove(i,j,i+1,j+1, board[i,j]));
+end;
 
 procedure AddAllPossibleMoves(color: PlayerColor);
 var i,j: longint;
@@ -1046,22 +1064,7 @@ begin
       end else
       if (abs(curfig) = WHITE_KING) then
       begin
-        curmov := CreateMove(i,j,i-1,j-1, curfig);
-        AddMove(curmov);
-        curmov := CreateMove(i,j,i-1,j,   curfig);
-        AddMove(curmov);
-        curmov := CreateMove(i,j,i-1,j+1, curfig);
-        AddMove(curmov);
-        curmov := CreateMove(i,j,i,  j-1, curfig);
-        AddMove(curmov);
-        curmov := CreateMove(i,j,i,  j+1, curfig);
-        AddMove(curmov);
-        curmov := CreateMove(i,j,i+1,j-1, curfig);
-        AddMove(curmov);
-        curmov := CreateMove(i,j,i+1,j,   curfig);
-        AddMove(curmov);
-        curmov := CreateMove(i,j,i+1,j+1, curfig);
-        AddMove(curmov);
+        AddAllPossibleKingMoves(board, i, j);
       end;
     end;
   end;
