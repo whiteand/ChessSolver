@@ -935,6 +935,51 @@ begin
   end;
 end;
 
+procedure AddAllPossibleKnightMoves(var board: TBoard; i, j: shortint);
+var curfig: shortint;
+    color: PlayerColor;
+begin
+  curfig := board[i,j];
+  color := ColorOf(curfig);
+
+  assert(abs(curfig) = WHITE_KNIGHT, 'invariant broken');
+  
+  // Rewrite with a loop.
+  if HasEnemyOrEmpty(color, i-2,j-1, board) then
+  begin
+    AddMove(CreateMove(i,j,i-2,j-1, curfig));
+  end;
+  if HasEnemyOrEmpty(color, i-2,j+1, board) then
+  begin
+    AddMove(CreateMove(i,j,i-2,j+1, curfig));
+  end;
+  if HasEnemyOrEmpty(color, i+2,j-1, board) then
+  begin
+    AddMove(CreateMove(i,j,i+2,j-1, curfig));
+  end;
+  if HasEnemyOrEmpty(color,i+2,j+1,board) then
+  begin
+    AddMove(CreateMove(i,j,i+2,j+1, curfig));
+  end;
+
+  if (HasEnemyOrEmpty(color,i-1,j-2,board)) then
+  begin
+    AddMove(CreateMove(i,j,i-1,j-2, curfig));
+  end;
+  if HasEnemyOrEmpty(color, i-1, j+2, board) then
+  begin
+    AddMove(CreateMove(i,j,i-1,j+2, curfig));
+  end;
+  if HasEnemyOrEmpty(color, i+1,j-2, board) then
+  begin
+    AddMove(CreateMove(i,j,i+1,j-2, curfig));
+  end;
+  if HasEnemyOrEmpty(color, i+1,j+2, board) then
+  begin
+    AddMove(CreateMove(i,j,i+1,j+2, curfig));
+  end;
+end;
+
 procedure AddAllPossibleMoves(color: PlayerColor);
 var i,j: longint;
     curfig: longint; // Curent Figure
@@ -955,49 +1000,9 @@ begin
       begin
         AddAllPossiblePawnMoves(board, i, j);
       end else
-      if (abs(curfig) = WHITE_KNIGHT) then //-----------------------------------------------------Loshad
+      if (abs(curfig) = WHITE_KNIGHT) then
       begin
-        if HasEnemyOrEmpty(color, i-2,j-1, board) then
-        begin
-          curmov := CreateMove(i,j,i-2,j-1, curfig);
-          AddMove(curMov);
-        end;
-        if HasEnemyOrEmpty(color, i-2,j+1, board) then
-        begin
-          curmov := CreateMove(i,j,i-2,j+1, curfig);
-          AddMove(curMov);
-        end;
-        if HasEnemyOrEmpty(color, i+2,j-1, board) then
-        begin
-          curmov := CreateMove(i,j,i+2,j-1, curfig);
-          AddMove(curMov);
-        end;
-        if HasEnemyOrEmpty(color,i+2,j+1,board) then
-        begin
-          curmov := CreateMove(i,j,i+2,j+1, curfig);
-          AddMove(curMov);
-        end;
-
-        if (HasEnemyOrEmpty(color,i-1,j-2,board)) then
-        begin
-          curmov := CreateMove(i,j,i-1,j-2, curfig);
-          AddMove(curMov);
-        end;
-        if HasEnemyOrEmpty(color, i-1, j+2, board) then
-        begin
-          curmov := CreateMove(i,j,i-1,j+2, curfig);
-          AddMove(curMov);
-        end;
-        if HasEnemyOrEmpty(color, i+1,j-2, board) then
-        begin
-          curmov := CreateMove(i,j,i+1,j-2, curfig);
-          AddMove(curMov);
-        end;
-        if HasEnemyOrEmpty(color, i+1,j+2, board) then
-        begin
-          curmov := CreateMove(i,j,i+1,j+2, curfig);
-          AddMove(curMov);
-        end;
+        AddAllPossibleKnightMoves(board, i, j);
       end else
       if (abs(curfig) = WHITE_BISHOP) then
       begin
