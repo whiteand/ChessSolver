@@ -311,6 +311,18 @@ begin
     King: Exit(WHITE_KING * sign);
   end;
 end;
+function GetFigureFromValue(figureValue: shortint): ChessFigure;
+begin
+  case abs(figureValue) of
+    WHITE_PAWN: Exit(Pawn);
+    WHITE_KNIGHT: Exit(Knight);
+    WHITE_BISHOP: Exit(Bishop);
+    WHITE_ROOK: Exit(Rook);
+    WHITE_QUEEN: Exit(Queen);
+    WHITE_KING: Exit(King);
+  end;
+  assert(false, 'Unknown figure value');
+end;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -941,7 +953,6 @@ begin
   end;
 end;
 
-
 procedure AddAllPossibleKnightMoves(var board: TBoard; i, j: shortint);
 var curfig: shortint;
     color: PlayerColor;
@@ -1028,43 +1039,20 @@ end;
 
 procedure AddAllPossibleMoves(color: PlayerColor);
 var i,j: longint;
-    curfig: longint; // Curent Figure
-    curmov: Move;
-    currentPawnMoveDirection: shortint;
 begin
   for i:=1 to BOARD_SIZE do
   begin
     for j:=1 to BOARD_SIZE do
     begin
-      {TODO: Replace board[i,j]*color to function "HasPieceOfColor(i,j,color)"}
-      {TODO: decrease nestedness}
       if not HasPieceOfColor(board, i, j, color) then continue;
 
-
-      curfig := board[i,j];
-      if (abs(curfig) = WHITE_PAWN) then
-      begin
-        AddAllPossiblePawnMoves(board, i, j);
-      end else
-      if (abs(curfig) = WHITE_KNIGHT) then
-      begin
-        AddAllPossibleKnightMoves(board, i, j);
-      end else
-      if (abs(curfig) = WHITE_BISHOP) then
-      begin
-        AddAllPossibleBishopMoves(board, i, j);
-      end else
-      if (abs(curfig) = WHITE_ROOK) then
-      begin
-        AddAllPossibleRookMoves(board, i, j);
-      end else
-      if (abs(curfig) = WHITE_QUEEN) then
-      begin
-        AddAllPossibleQueenMoves(board, i, j);
-      end else
-      if (abs(curfig) = WHITE_KING) then
-      begin
-        AddAllPossibleKingMoves(board, i, j);
+      case GetFigureFromValue(board[i, j]) of
+        Pawn: AddAllPossiblePawnMoves(board, i, j);
+        Knight: AddAllPossibleKnightMoves(board, i, j);
+        Bishop: AddAllPossibleBishopMoves(board, i, j);
+        Rook: AddAllPossibleRookMoves(board, i, j);
+        Queen: AddAllPossibleQueenMoves(board, i, j);
+        King: AddAllPossibleKingMoves(board, i, j);
       end;
     end;
   end;
