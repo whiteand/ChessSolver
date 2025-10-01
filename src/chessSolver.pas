@@ -865,6 +865,11 @@ begin
    and ((board[i,j] = EMPTY_CELL) or (ColorOf(board[i,j]) <> myColor))
 end;
 
+function HasPieceOfColor(var board:TBoard; i, j: shortint; color: PlayerColor): boolean;
+begin
+  HasPieceOfColor := (board[i,j] <> EMPTY_CELL) and (ColorOf(board[i,j]) = color);
+end;
+
 procedure AddAllPossibleMoves(color: PlayerColor);
 var i,j: longint;
     curfig: longint; // Curent Figure
@@ -877,162 +882,161 @@ begin
     begin
       {TODO: Replace board[i,j]*color to function "HasPieceOfColor(i,j,color)"}
       {TODO: decrease nestedness}
-      if (board[i,j] <> EMPTY_CELL) and (ColorOf(board[i,j]) = color) then
+      if not HasPieceOfColor(board, i, j, color) then continue;
+
+      curfig := board[i,j];
+      if (abs(curfig) = WHITE_PAWN) then
       begin
-        curfig := board[i,j];
-        if (abs(curfig) = WHITE_PAWN) then
-        begin
-          // WHITE_PAWN_MOVE_DIRECTION = -1
-          // color = 1
-          //  color = white <- isA1AtTheRightTopCorner
-          // color = -1
+        // WHITE_PAWN_MOVE_DIRECTION = -1
+        // color = 1
+        //  color = white <- isA1AtTheRightTopCorner
+        // color = -1
 
-          if ColorOf(curfig) = PlayerColorWhite then
-          begin
-            currentPawnMoveDirection := WHITE_PAWN_MOVE_DIRECTION;
-          end else 
-          begin
-            currentPawnMoveDirection := -WHITE_PAWN_MOVE_DIRECTION;
-          end;
-
-          if HasEnemy(
-             color,
-             i + currentPawnMoveDirection, j - 1,
-             board
-          ) then
-          begin
-              curmov := CreateMove(
-                i,j,
-                i + currentPawnMoveDirection, j - 1,
-                curfig
-              );
-              AddMove(curMov);
-          end;
-          if HasEnemy(
-             color,
-             i + currentPawnMoveDirection, j + 1,
-             board
-          ) then
-          begin
-              curmov := CreateMove(
-                i,j,
-                i + currentPawnMoveDirection, j + 1,
-                curfig
-              );
-              AddMove(curMov);
-          end;
-          if board[i + currentPawnMoveDirection, j] = EMPTY_CELL then
-          begin
-            curmov := CreateMove(i,j,i+currentPawnMoveDirection,j, curfig);
-            AddMove(curMov);
-          end;
-          if (color = PlayerColorWhite) and (i = BOARD_SIZE - 1) then
-          begin
-            if (GetFigureOn(i + WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
-              and (GetFigureOn(i + 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
-            begin
-                curmov := CreateMove(i,j,i + 2 * WHITE_PAWN_MOVE_DIRECTION, j, curfig);
-                AddMove(curMov);
-            end;
-          end;
-          if (color = PlayerColorBlack) and (i = 2) then
-          begin
-            if (GetFigureOn(i - WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
-              and (GetFigureOn(i - 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
-            begin
-                curmov := CreateMove(i,j,i - 2 * WHITE_PAWN_MOVE_DIRECTION,j, curfig);
-                AddMove(curMov);
-            end;
-          end;
-        end else
-        if (abs(curfig) = WHITE_KNIGHT) then //-----------------------------------------------------Loshad
+        if ColorOf(curfig) = PlayerColorWhite then
         begin
-          if HasEnemyOrEmpty(color, i-2,j-1, board) then
-          begin
-            curmov := CreateMove(i,j,i-2,j-1, curfig);
-            AddMove(curMov);
-          end;
-          if HasEnemyOrEmpty(color, i-2,j+1, board) then
-          begin
-            curmov := CreateMove(i,j,i-2,j+1, curfig);
-            AddMove(curMov);
-          end;
-          if HasEnemyOrEmpty(color, i+2,j-1, board) then
-          begin
-            curmov := CreateMove(i,j,i+2,j-1, curfig);
-            AddMove(curMov);
-          end;
-          if HasEnemyOrEmpty(color,i+2,j+1,board) then
-          begin
-            curmov := CreateMove(i,j,i+2,j+1, curfig);
-            AddMove(curMov);
-          end;
-
-          if (HasEnemyOrEmpty(color,i-1,j-2,board)) then
-          begin
-            curmov := CreateMove(i,j,i-1,j-2, curfig);
-            AddMove(curMov);
-          end;
-          if HasEnemyOrEmpty(color, i-1, j+2, board) then
-          begin
-            curmov := CreateMove(i,j,i-1,j+2, curfig);
-            AddMove(curMov);
-          end;
-          if HasEnemyOrEmpty(color, i+1,j-2, board) then
-          begin
-            curmov := CreateMove(i,j,i+1,j-2, curfig);
-            AddMove(curMov);
-          end;
-          if HasEnemyOrEmpty(color, i+1,j+2, board) then
-          begin
-            curmov := CreateMove(i,j,i+1,j+2, curfig);
-            AddMove(curMov);
-          end;
-        end else
-        if (abs(curfig) = WHITE_BISHOP) then
+          currentPawnMoveDirection := WHITE_PAWN_MOVE_DIRECTION;
+        end else 
         begin
-          AddMovesDist(i,j,-1,-1);
-          AddMovesDist(i,j,-1, 1);
-          AddMovesDist(i,j, 1,-1);
-          AddMovesDist(i,j, 1, 1);
-        end else
-        if (abs(curfig) = WHITE_ROOK) then
-        begin
-          AddMovesDist(i,j,-1, 0);
-          AddMovesDist(i,j, 0, 1);
-          AddMovesDist(i,j, 1, 0);
-          AddMovesDist(i,j, 0,-1);
-        end else
-        if (abs(curfig) = WHITE_QUEEN) then
-        begin
-          AddMovesDist(i,j,-1,-1);
-          AddMovesDist(i,j,-1, 1);
-          AddMovesDist(i,j, 1,-1);
-          AddMovesDist(i,j, 1, 1);
-          AddMovesDist(i,j,-1, 0);
-          AddMovesDist(i,j, 0, 1);
-          AddMovesDist(i,j, 1, 0);
-          AddMovesDist(i,j, 0,-1);
-        end else
-        if (abs(curfig) = WHITE_KING) then
-        begin
-          curmov := CreateMove(i,j,i-1,j-1, curfig);
-          AddMove(curmov);
-          curmov := CreateMove(i,j,i-1,j,   curfig);
-          AddMove(curmov);
-          curmov := CreateMove(i,j,i-1,j+1, curfig);
-          AddMove(curmov);
-          curmov := CreateMove(i,j,i,  j-1, curfig);
-          AddMove(curmov);
-          curmov := CreateMove(i,j,i,  j+1, curfig);
-          AddMove(curmov);
-          curmov := CreateMove(i,j,i+1,j-1, curfig);
-          AddMove(curmov);
-          curmov := CreateMove(i,j,i+1,j,   curfig);
-          AddMove(curmov);
-          curmov := CreateMove(i,j,i+1,j+1, curfig);
-          AddMove(curmov);
+          currentPawnMoveDirection := -WHITE_PAWN_MOVE_DIRECTION;
         end;
+
+        if HasEnemy(
+            color,
+            i + currentPawnMoveDirection, j - 1,
+            board
+        ) then
+        begin
+            curmov := CreateMove(
+              i,j,
+              i + currentPawnMoveDirection, j - 1,
+              curfig
+            );
+            AddMove(curMov);
+        end;
+        if HasEnemy(
+            color,
+            i + currentPawnMoveDirection, j + 1,
+            board
+        ) then
+        begin
+            curmov := CreateMove(
+              i,j,
+              i + currentPawnMoveDirection, j + 1,
+              curfig
+            );
+            AddMove(curMov);
+        end;
+        if board[i + currentPawnMoveDirection, j] = EMPTY_CELL then
+        begin
+          curmov := CreateMove(i,j,i+currentPawnMoveDirection,j, curfig);
+          AddMove(curMov);
+        end;
+        if (color = PlayerColorWhite) and (i = BOARD_SIZE - 1) then
+        begin
+          if (GetFigureOn(i + WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
+            and (GetFigureOn(i + 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
+          begin
+              curmov := CreateMove(i,j,i + 2 * WHITE_PAWN_MOVE_DIRECTION, j, curfig);
+              AddMove(curMov);
+          end;
+        end;
+        if (color = PlayerColorBlack) and (i = 2) then
+        begin
+          if (GetFigureOn(i - WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
+            and (GetFigureOn(i - 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
+          begin
+              curmov := CreateMove(i,j,i - 2 * WHITE_PAWN_MOVE_DIRECTION,j, curfig);
+              AddMove(curMov);
+          end;
+        end;
+      end else
+      if (abs(curfig) = WHITE_KNIGHT) then //-----------------------------------------------------Loshad
+      begin
+        if HasEnemyOrEmpty(color, i-2,j-1, board) then
+        begin
+          curmov := CreateMove(i,j,i-2,j-1, curfig);
+          AddMove(curMov);
+        end;
+        if HasEnemyOrEmpty(color, i-2,j+1, board) then
+        begin
+          curmov := CreateMove(i,j,i-2,j+1, curfig);
+          AddMove(curMov);
+        end;
+        if HasEnemyOrEmpty(color, i+2,j-1, board) then
+        begin
+          curmov := CreateMove(i,j,i+2,j-1, curfig);
+          AddMove(curMov);
+        end;
+        if HasEnemyOrEmpty(color,i+2,j+1,board) then
+        begin
+          curmov := CreateMove(i,j,i+2,j+1, curfig);
+          AddMove(curMov);
+        end;
+
+        if (HasEnemyOrEmpty(color,i-1,j-2,board)) then
+        begin
+          curmov := CreateMove(i,j,i-1,j-2, curfig);
+          AddMove(curMov);
+        end;
+        if HasEnemyOrEmpty(color, i-1, j+2, board) then
+        begin
+          curmov := CreateMove(i,j,i-1,j+2, curfig);
+          AddMove(curMov);
+        end;
+        if HasEnemyOrEmpty(color, i+1,j-2, board) then
+        begin
+          curmov := CreateMove(i,j,i+1,j-2, curfig);
+          AddMove(curMov);
+        end;
+        if HasEnemyOrEmpty(color, i+1,j+2, board) then
+        begin
+          curmov := CreateMove(i,j,i+1,j+2, curfig);
+          AddMove(curMov);
+        end;
+      end else
+      if (abs(curfig) = WHITE_BISHOP) then
+      begin
+        AddMovesDist(i,j,-1,-1);
+        AddMovesDist(i,j,-1, 1);
+        AddMovesDist(i,j, 1,-1);
+        AddMovesDist(i,j, 1, 1);
+      end else
+      if (abs(curfig) = WHITE_ROOK) then
+      begin
+        AddMovesDist(i,j,-1, 0);
+        AddMovesDist(i,j, 0, 1);
+        AddMovesDist(i,j, 1, 0);
+        AddMovesDist(i,j, 0,-1);
+      end else
+      if (abs(curfig) = WHITE_QUEEN) then
+      begin
+        AddMovesDist(i,j,-1,-1);
+        AddMovesDist(i,j,-1, 1);
+        AddMovesDist(i,j, 1,-1);
+        AddMovesDist(i,j, 1, 1);
+        AddMovesDist(i,j,-1, 0);
+        AddMovesDist(i,j, 0, 1);
+        AddMovesDist(i,j, 1, 0);
+        AddMovesDist(i,j, 0,-1);
+      end else
+      if (abs(curfig) = WHITE_KING) then
+      begin
+        curmov := CreateMove(i,j,i-1,j-1, curfig);
+        AddMove(curmov);
+        curmov := CreateMove(i,j,i-1,j,   curfig);
+        AddMove(curmov);
+        curmov := CreateMove(i,j,i-1,j+1, curfig);
+        AddMove(curmov);
+        curmov := CreateMove(i,j,i,  j-1, curfig);
+        AddMove(curmov);
+        curmov := CreateMove(i,j,i,  j+1, curfig);
+        AddMove(curmov);
+        curmov := CreateMove(i,j,i+1,j-1, curfig);
+        AddMove(curmov);
+        curmov := CreateMove(i,j,i+1,j,   curfig);
+        AddMove(curmov);
+        curmov := CreateMove(i,j,i+1,j+1, curfig);
+        AddMove(curmov);
       end;
     end;
   end;
