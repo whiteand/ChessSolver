@@ -996,6 +996,17 @@ begin
   AddMovesDist(i,j, 1, 0);
   AddMovesDist(i,j, 0,-1);
 end;
+procedure AddAllPossibleQueenMoves(var board: TBoard; i, j: shortint);
+begin
+  AddMovesDist(i,j,-1,-1);
+  AddMovesDist(i,j,-1, 1);
+  AddMovesDist(i,j, 1,-1);
+  AddMovesDist(i,j, 1, 1);
+  AddMovesDist(i,j,-1, 0);
+  AddMovesDist(i,j, 0, 1);
+  AddMovesDist(i,j, 1, 0);
+  AddMovesDist(i,j, 0,-1);
+end;
 
 procedure AddAllPossibleMoves(color: PlayerColor);
 var i,j: longint;
@@ -1031,14 +1042,7 @@ begin
       end else
       if (abs(curfig) = WHITE_QUEEN) then
       begin
-        AddMovesDist(i,j,-1,-1);
-        AddMovesDist(i,j,-1, 1);
-        AddMovesDist(i,j, 1,-1);
-        AddMovesDist(i,j, 1, 1);
-        AddMovesDist(i,j,-1, 0);
-        AddMovesDist(i,j, 0, 1);
-        AddMovesDist(i,j, 1, 0);
-        AddMovesDist(i,j, 0,-1);
+        AddAllPossibleQueenMoves(board, i, j);
       end else
       if (abs(curfig) = WHITE_KING) then
       begin
