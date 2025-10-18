@@ -326,7 +326,7 @@ end;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure FindKing(color: PlayerColor; var i0,j0: longint);
+procedure FindKing(var board: TBoard; color: PlayerColor; var i0,j0: longint);
 var i,j: longint;
 begin
   for i:=1 to BOARD_SIZE do
@@ -483,7 +483,7 @@ begin
   if f > 0 then Exit(PlayerColorWhite)
   else if f < 0 then Exit(PlayerColorBlack)
 end;
-function GetFigureOn(i,j: longint): longint;
+function GetFigureOn(var board: TBoard; i,j: longint): longint;
 begin
   if (i>=1) and (i<=BOARD_SIZE) and (j>=1) and (j<=BOARD_SIZE) then
   begin
@@ -495,7 +495,7 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function SearchTo(i0,j0,dn,dm: longint): longint;
+function SearchTo(var board: TBoard; i0,j0,dn,dm: longint): longint;
 var i,j: longint;
     current: longint;
 begin
@@ -504,7 +504,7 @@ begin
 
   while (i<=BOARD_SIZE) and (i>=1) and (j<=BOARD_SIZE) and (j>=1) do
   begin
-	  current := GetFigureOn(i,j);
+	  current := GetFigureOn(board, i,j);
     if current <> 0 then Exit(current);
     i := i + dn;
     j := j + dm;
@@ -524,13 +524,13 @@ begin
   begin
     if (figure*WHITE_PAWN_MOVE_DIRECTION > 0) then
     begin
-    	if (GetFigureOn(i0+1,j0+1) = figure) or (GetFigureOn(i0+1,j0-1) = figure) then
+    	if (GetFigureOn(board, i0+1,j0+1) = figure) or (GetFigureOn(board, i0+1,j0-1) = figure) then
     	begin
     		res := true;
     	end;
     end else
     begin
-    	if (GetFigureOn(i0-1,j0+1) = figure) or (GetFigureOn(i0-1,j0-1) = figure) then
+    	if (GetFigureOn(board, i0-1,j0+1) = figure) or (GetFigureOn(board, i0-1,j0-1) = figure) then
     	begin
     		res := true;
     	end;
@@ -538,36 +538,36 @@ begin
   end else
   if (abs(figure) = WHITE_KNIGHT) then
   begin
-  	if ((GetFigureOn(i0-2,j0-1) = figure) or
-                (GetFigureOn(i0-2,j0+1) = figure) or
-  		(GetFigureOn(i0+2,j0-1) = figure) or
-  		(GetFigureOn(i0+2,j0+1) = figure) or
-  		(GetFigureOn(i0-1,j0-2) = figure) or
-  		(GetFigureOn(i0-1,j0+2) = figure) or
-  		(GetFigureOn(i0+1,j0-2) = figure) or
-  		(GetFigureOn(i0+1,j0+2) = figure)) then
+  	if ((GetFigureOn(board, i0-2,j0-1) = figure) or
+                (GetFigureOn(board, i0-2,j0+1) = figure) or
+  		(GetFigureOn(board, i0+2,j0-1) = figure) or
+  		(GetFigureOn(board, i0+2,j0+1) = figure) or
+  		(GetFigureOn(board, i0-1,j0-2) = figure) or
+  		(GetFigureOn(board, i0-1,j0+2) = figure) or
+  		(GetFigureOn(board, i0+1,j0-2) = figure) or
+  		(GetFigureOn(board, i0+1,j0+2) = figure)) then
   	begin
   		res := true;
   	end
   end else
   if (abs(figure) = WHITE_BISHOP) then
   begin
-  	if (SearchTo(i0,j0,-1,-1) = figure) then
+  	if (SearchTo(board, i0,j0,-1,-1) = figure) then
   	begin
   		//To The left top
   		res := true;
   	end
-  	else if (SearchTo(i0,j0,-1,1) = figure) then
+  	else if (SearchTo(board, i0,j0,-1,1) = figure) then
   	begin
   		//To The right Top
   		res := true;
   	end
-	else if (SearchTo(i0,j0,1,-1) = figure) then
+	else if (SearchTo(board, i0,j0,1,-1) = figure) then
   	begin
   		//To the left bottom
   		res := true;
   	end
-  	else if (SearchTo(i0,j0,1,1) = figure) then
+  	else if (SearchTo(board, i0,j0,1,1) = figure) then
   	begin
 	  	//to the right bottom
   		res := true;
@@ -577,16 +577,16 @@ begin
   if (abs(figure) = WHITE_ROOK) then
   begin
   	//Search
-  	if (SearchTo(i0,j0,-1,0) = figure) then
+  	if (SearchTo(board, i0,j0,-1,0) = figure) then
   	begin
   		res := true;
-  	end else if (SearchTo(i0,j0,1,0) = figure) then
+  	end else if (SearchTo(board, i0,j0,1,0) = figure) then
   	begin
   		res := true;
-  	end else if (SearchTo(i0,j0,0,-1) = figure) then
+  	end else if (SearchTo(board, i0,j0,0,-1) = figure) then
   	begin
   		res := true;
-  	end else if (SearchTo(i0,j0,0,1) = figure) then
+  	end else if (SearchTo(board, i0,j0,0,1) = figure) then
   	begin
   		res := true;
   	end;
@@ -595,42 +595,42 @@ begin
   if (abs(figure) = WHITE_QUEEN) then
   begin
   	//Search
-  	if (SearchTo(i0,j0,-1,-1) = figure) then
+  	if (SearchTo(board, i0,j0,-1,-1) = figure) then
   	begin
   		res := true;
-  	end else if (SearchTo(i0,j0,-1,0) = figure) then
+  	end else if (SearchTo(board, i0,j0,-1,0) = figure) then
   	begin
   		res := true;
-  	end else if (SearchTo(i0,j0,-1,1) = figure) then
+  	end else if (SearchTo(board, i0,j0,-1,1) = figure) then
   	begin
   		res := true;
-  	end else if (SearchTo(i0,j0,0,1) = figure) then
+  	end else if (SearchTo(board, i0,j0,0,1) = figure) then
   	begin
   		res := true;
-  	end else if (SearchTo(i0,j0,1,1) = figure) then
+  	end else if (SearchTo(board, i0,j0,1,1) = figure) then
   	begin
   		res := true;
-  	end else if (SearchTo(i0,j0,1,0) = figure) then
+  	end else if (SearchTo(board, i0,j0,1,0) = figure) then
   	begin
   		res := true;
-  	end else if (SearchTo(i0,j0,1,-1) = figure) then
+  	end else if (SearchTo(board, i0,j0,1,-1) = figure) then
   	begin
   		res := true;
-  	end else if (SearchTo(i0,j0,0,-1) = figure) then
+  	end else if (SearchTo(board, i0,j0,0,-1) = figure) then
   	begin
   		res := true;
   	end;
   end else
   if (abs(figure) = WHITE_KING) then
   begin
-  	if ((GetFigureOn(i0-1,j0-1) = figure) or
-  	    (GetFigureOn(i0-1,j0) = figure) or
-  	    (GetFigureOn(i0-1,j0+1) = figure) or
-  	    (GetFigureOn(i0,j0-1) = figure) or
-  	    (GetFigureOn(i0,j0+1) = figure) or
-  	    (GetFigureOn(i0+1,j0-1) = figure) or
-  	    (GetFigureOn(i0+1,j0) = figure) or
-  	    (GetFigureOn(i0+1,j0+1) = figure)) then
+  	if ((GetFigureOn(board, i0-1,j0-1) = figure) or
+  	    (GetFigureOn(board, i0-1,j0) = figure) or
+  	    (GetFigureOn(board, i0-1,j0+1) = figure) or
+  	    (GetFigureOn(board, i0,j0-1) = figure) or
+  	    (GetFigureOn(board, i0,j0+1) = figure) or
+  	    (GetFigureOn(board, i0+1,j0-1) = figure) or
+  	    (GetFigureOn(board, i0+1,j0) = figure) or
+  	    (GetFigureOn(board, i0+1,j0+1) = figure)) then
   	begin
   		res := true;
   	end
@@ -800,11 +800,13 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function IsCheckTo(color: PlayerColor):boolean; //TOWRITE
+function IsCheckTo(var board: TBoard; color: PlayerColor):boolean; //TOWRITE
 var res: boolean;
     i,j: longint;
 begin
-  FindKing(color,i,j);
+  i := -1;
+  j := -1;
+  FindKing(board, color,i,j);
   res := IsUnderAttackBy(OppositeColor(color), i,j);
   IsCheckTo := res;
 end;
@@ -813,7 +815,7 @@ end;
 // if the move is valid (figure moves into empty cell or attacks an enemy)
 // AND king is not under attack after the move
 //-----------------------------------------------------------------------------
-procedure AddMove(m: Move);
+procedure AddMove(var board: TBoard; m: Move);
 var isCheckAfterMove: boolean;
     isMoveToEmptyCell: boolean;
     isOppositeColorAttacked: boolean;
@@ -822,7 +824,7 @@ begin
   begin
     DoMove(m);
     
-    isCheckAfterMove := IsCheckTo(ColorOf(m.figureStart));
+    isCheckAfterMove := IsCheckTo(board, ColorOf(m.figureStart));
     isMoveToEmptyCell := m.figureEnd = EMPTY_CELL;
     isOppositeColorAttacked := (not isMoveToEmptyCell) and (ColorOf(m.figurestart)<>ColorOf(m.figureEnd)); 
 
@@ -833,7 +835,7 @@ begin
     UndoMove(m);
   end;
 end;
-procedure AddMovesDist(i0,j0,dn,dm: longint);
+procedure AddMovesDist(var board: TBoard; i0,j0,dn,dm: longint);
 var i,j: longint;
     currentfigure: longint;
     current: longint;
@@ -841,18 +843,18 @@ var i,j: longint;
 begin
   i := i0 + dn;
   j := j0 + dm;
-  currentFigure := GetFigureOn(i0,j0);
-  current := GetFigureOn(i,j);
+  currentFigure := GetFigureOn(board, i0,j0);
+  current := GetFigureOn(board, i,j);
   if (dn <> 0) or (dm <> 0) then
   begin
     while (current*currentFigure <= 0) and (i<=BOARD_SIZE) and (i>=1) and (j<=BOARD_SIZE) and (j>=1) do
     begin
       curmov := CreateMove(i0,j0,i,j, currentFigure);
-      AddMove(curmov);
+      AddMove(board, curmov);
       if (current*currentFigure < 0) then break;
       i := i + dn;
       j := j + dm;
-      current := GetFigureOn(i,j);
+      current := GetFigureOn(board, i,j);
 
     end;
   end;
@@ -913,7 +915,7 @@ begin
       board
   ) then
   begin
-      AddMove(CreateMove(
+      AddMove(board, CreateMove(
         i,j,
         i + currentPawnMoveDirection, j - 1,
         curfig
@@ -925,7 +927,7 @@ begin
       board
   ) then
   begin
-      AddMove(CreateMove(
+      AddMove(board, CreateMove(
         i,j,
         i + currentPawnMoveDirection, j + 1,
         curfig
@@ -933,22 +935,22 @@ begin
   end;
   if board[i + currentPawnMoveDirection, j] = EMPTY_CELL then
   begin
-    AddMove(CreateMove(i,j,i+currentPawnMoveDirection,j, curfig));
+    AddMove(board, CreateMove(i,j,i+currentPawnMoveDirection,j, curfig));
   end;
   if (color = PlayerColorWhite) and (i = BOARD_SIZE - 1) then
   begin
-    if (GetFigureOn(i + WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
-      and (GetFigureOn(i + 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
+    if (GetFigureOn(board, i + WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
+      and (GetFigureOn(board, i + 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
     begin
-        AddMove(CreateMove(i,j,i + 2 * WHITE_PAWN_MOVE_DIRECTION, j, curfig));
+        AddMove(board, CreateMove(i,j,i + 2 * WHITE_PAWN_MOVE_DIRECTION, j, curfig));
     end;
   end;
   if (color = PlayerColorBlack) and (i = 2) then
   begin
-    if (GetFigureOn(i - WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
-      and (GetFigureOn(i - 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
+    if (GetFigureOn(board, i - WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
+      and (GetFigureOn(board, i - 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
     begin
-        AddMove(CreateMove(i,j,i - 2 * WHITE_PAWN_MOVE_DIRECTION,j, curfig));
+        AddMove(board, CreateMove(i,j,i - 2 * WHITE_PAWN_MOVE_DIRECTION,j, curfig));
     end;
   end;
 end;
@@ -965,76 +967,76 @@ begin
   // Rewrite with a loop.
   if HasEnemyOrEmpty(color, i-2,j-1, board) then
   begin
-    AddMove(CreateMove(i,j,i-2,j-1, curfig));
+    AddMove(board, CreateMove(i,j,i-2,j-1, curfig));
   end;
   if HasEnemyOrEmpty(color, i-2,j+1, board) then
   begin
-    AddMove(CreateMove(i,j,i-2,j+1, curfig));
+    AddMove(board, CreateMove(i,j,i-2,j+1, curfig));
   end;
   if HasEnemyOrEmpty(color, i+2,j-1, board) then
   begin
-    AddMove(CreateMove(i,j,i+2,j-1, curfig));
+    AddMove(board, CreateMove(i,j,i+2,j-1, curfig));
   end;
   if HasEnemyOrEmpty(color,i+2,j+1,board) then
   begin
-    AddMove(CreateMove(i,j,i+2,j+1, curfig));
+    AddMove(board, CreateMove(i,j,i+2,j+1, curfig));
   end;
 
   if (HasEnemyOrEmpty(color,i-1,j-2,board)) then
   begin
-    AddMove(CreateMove(i,j,i-1,j-2, curfig));
+    AddMove(board, CreateMove(i,j,i-1,j-2, curfig));
   end;
   if HasEnemyOrEmpty(color, i-1, j+2, board) then
   begin
-    AddMove(CreateMove(i,j,i-1,j+2, curfig));
+    AddMove(board, CreateMove(i,j,i-1,j+2, curfig));
   end;
   if HasEnemyOrEmpty(color, i+1,j-2, board) then
   begin
-    AddMove(CreateMove(i,j,i+1,j-2, curfig));
+    AddMove(board, CreateMove(i,j,i+1,j-2, curfig));
   end;
   if HasEnemyOrEmpty(color, i+1,j+2, board) then
   begin
-    AddMove(CreateMove(i,j,i+1,j+2, curfig));
+    AddMove(board, CreateMove(i,j,i+1,j+2, curfig));
   end;
 end;
 
 procedure AddAllPossibleBishopMoves(var board: TBoard; i, j: shortint);
 begin
-  AddMovesDist(i,j,-1,-1);
-  AddMovesDist(i,j,-1, 1);
-  AddMovesDist(i,j, 1,-1);
-  AddMovesDist(i,j, 1, 1);
+  AddMovesDist(board, i,j,-1,-1);
+  AddMovesDist(board, i,j,-1, 1);
+  AddMovesDist(board, i,j, 1,-1);
+  AddMovesDist(board, i,j, 1, 1);
 end;
 
 procedure AddAllPossibleRookMoves(var board: TBoard; i, j: shortint);
 begin
-  AddMovesDist(i,j,-1, 0);
-  AddMovesDist(i,j, 0, 1);
-  AddMovesDist(i,j, 1, 0);
-  AddMovesDist(i,j, 0,-1);
+  AddMovesDist(board, i,j,-1, 0);
+  AddMovesDist(board, i,j, 0, 1);
+  AddMovesDist(board, i,j, 1, 0);
+  AddMovesDist(board, i,j, 0,-1);
 end;
 procedure AddAllPossibleQueenMoves(var board: TBoard; i, j: shortint);
 begin
-  AddMovesDist(i,j,-1,-1);
-  AddMovesDist(i,j,-1, 1);
-  AddMovesDist(i,j, 1,-1);
-  AddMovesDist(i,j, 1, 1);
-  AddMovesDist(i,j,-1, 0);
-  AddMovesDist(i,j, 0, 1);
-  AddMovesDist(i,j, 1, 0);
-  AddMovesDist(i,j, 0,-1);
+  AddMovesDist(board, i,j,-1,-1);
+  AddMovesDist(board, i,j,-1, 1);
+  AddMovesDist(board, i,j, 1,-1);
+  AddMovesDist(board, i,j, 1, 1);
+  AddMovesDist(board, i,j,-1, 0);
+  AddMovesDist(board, i,j, 0, 1);
+  AddMovesDist(board, i,j, 1, 0);
+  AddMovesDist(board, i,j, 0,-1);
 end;
 procedure AddAllPossibleKingMoves(var board: TBoard; i, j: shortint);
 begin
   assert(abs(board[i,j]) = WHITE_KING, 'invariant failed');
-  AddMove(CreateMove(i,j,i-1,j-1, board[i,j]));
-  AddMove(CreateMove(i,j,i-1,j,   board[i,j]));
-  AddMove(CreateMove(i,j,i-1,j+1, board[i,j]));
-  AddMove(CreateMove(i,j,i,  j-1, board[i,j]));
-  AddMove(CreateMove(i,j,i,  j+1, board[i,j]));
-  AddMove(CreateMove(i,j,i+1,j-1, board[i,j]));
-  AddMove(CreateMove(i,j,i+1,j,   board[i,j]));
-  AddMove(CreateMove(i,j,i+1,j+1, board[i,j]));
+  AddMove(board, CreateMove(i,j,i-1,j-1, board[i,j]));
+  AddMove(board, CreateMove(i,j,i-1,j,   board[i,j]));
+  AddMove(board, CreateMove(i,j,i-1,j+1, board[i,j]));
+  AddMove(board, CreateMove(i,j,i,  j-1, board[i,j]));
+  AddMove(board, CreateMove(i,j,i,  j+1, board[i,j]));
+  AddMove(board, CreateMove(i,j,i+1,j-1, board[i,j]));
+  AddMove(board, CreateMove(i,j,i+1,j,   board[i,j]));
+  AddMove(board, CreateMove(i,j,i+1,j+1, board[i,j]));
 end;
 
 procedure AddAllPossibleMoves(color: PlayerColor);
@@ -1060,6 +1062,7 @@ end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 procedure Solve(
+  var board: TBoard;
   color: PlayerColor;
   countOfMoves: longint;
   var buffer: TStrings;
@@ -1081,8 +1084,8 @@ begin
 
   isOk:= true;
 
-  checkWhite := IsCheckTo(PlayerColorWhite);
-  checkBlack := IsCheckTo(PlayerColorBlack);
+  checkWhite := IsCheckTo(board, PlayerColorWhite);
+  checkBlack := IsCheckTo(board, PlayerColorBlack);
 
   {
   | If current state didn't fixed previously set check
@@ -1099,7 +1102,7 @@ begin
     previousMoveWasCheckToBlacks := checkBlack;
     AddAllPossibleMoves(color);
     lastPossibleMoveIndex := moves.length-1;
-    if (lastPossibleMoveIndex < firstPossibleMoveIndex) and (IsCheckTo(PlayerColorBlack)) then
+    if (lastPossibleMoveIndex < firstPossibleMoveIndex) and (IsCheckTo(board, PlayerColorBlack)) then
     begin
         Inc(cSolving);
         if (maxcountOfPossiblemoves < moves.length) then maxcountofPossibleMoves := moves.length;
@@ -1115,6 +1118,7 @@ begin
       ShowChessBoard(board);
       {$ENDIF}
       Solve(
+        board,
         OppositeColor(color),
         countOfMoves -1,
         buffer,
@@ -1138,6 +1142,7 @@ Begin
   textbackground(0);
   clrscr;
   Solve(
+    board,
     PlayerColorWhite,
     cmdArgs.Moves*2,
     buffer,
