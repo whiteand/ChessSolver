@@ -825,7 +825,12 @@ begin
     UndoMove(board, makedMoves, m);
   end;
 end;
-procedure AddMovesDist(var board: TBoard; i0,j0,dn,dm: longint);
+procedure AddMovesDist(
+  var board: TBoard;
+  var makedMoves: TMoves;
+  var moves: TMoves;
+  i0,j0,dn,dm: longint
+);
 var i,j: longint;
     currentfigure: longint;
     current: longint;
@@ -845,7 +850,6 @@ begin
       i := i + dn;
       j := j + dm;
       current := GetFigureOn(board, i,j);
-
     end;
   end;
 end;
@@ -992,29 +996,29 @@ end;
 
 procedure AddAllPossibleBishopMoves(var board: TBoard; i, j: shortint);
 begin
-  AddMovesDist(board, i,j,-1,-1);
-  AddMovesDist(board, i,j,-1, 1);
-  AddMovesDist(board, i,j, 1,-1);
-  AddMovesDist(board, i,j, 1, 1);
+  AddMovesDist(board, makedMoves, moves, i,j,-1,-1);
+  AddMovesDist(board, makedMoves, moves, i,j,-1, 1);
+  AddMovesDist(board, makedMoves, moves, i,j, 1,-1);
+  AddMovesDist(board, makedMoves, moves, i,j, 1, 1);
 end;
 
 procedure AddAllPossibleRookMoves(var board: TBoard; i, j: shortint);
 begin
-  AddMovesDist(board, i,j,-1, 0);
-  AddMovesDist(board, i,j, 0, 1);
-  AddMovesDist(board, i,j, 1, 0);
-  AddMovesDist(board, i,j, 0,-1);
+  AddMovesDist(board, makedMoves, moves, i,j,-1, 0);
+  AddMovesDist(board, makedMoves, moves, i,j, 0, 1);
+  AddMovesDist(board, makedMoves, moves, i,j, 1, 0);
+  AddMovesDist(board, makedMoves, moves, i,j, 0,-1);
 end;
 procedure AddAllPossibleQueenMoves(var board: TBoard; i, j: shortint);
 begin
-  AddMovesDist(board, i,j,-1,-1);
-  AddMovesDist(board, i,j,-1, 1);
-  AddMovesDist(board, i,j, 1,-1);
-  AddMovesDist(board, i,j, 1, 1);
-  AddMovesDist(board, i,j,-1, 0);
-  AddMovesDist(board, i,j, 0, 1);
-  AddMovesDist(board, i,j, 1, 0);
-  AddMovesDist(board, i,j, 0,-1);
+  AddMovesDist(board, makedMoves, moves, i,j,-1,-1);
+  AddMovesDist(board, makedMoves, moves, i,j,-1, 1);
+  AddMovesDist(board, makedMoves, moves, i,j, 1,-1);
+  AddMovesDist(board, makedMoves, moves, i,j, 1, 1);
+  AddMovesDist(board, makedMoves, moves, i,j,-1, 0);
+  AddMovesDist(board, makedMoves, moves, i,j, 0, 1);
+  AddMovesDist(board, makedMoves, moves, i,j, 1, 0);
+  AddMovesDist(board, makedMoves, moves, i,j, 0,-1);
 end;
 procedure AddAllPossibleKingMoves(var board: TBoard; i, j: shortint);
 begin
