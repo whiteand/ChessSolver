@@ -779,7 +779,7 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure UndoMove(var m: Move);
+procedure UndoMove(var board: TBoard; var makedMoves: TMoves; var m: Move);
 begin
   with m do
   begin
@@ -822,7 +822,7 @@ begin
     begin
       TMovesPush(m, moves);
     end;
-    UndoMove(m);
+    UndoMove(board, makedMoves, m);
   end;
 end;
 procedure AddMovesDist(var board: TBoard; i0,j0,dn,dm: longint);
@@ -1121,7 +1121,7 @@ begin
         showEnemyMoves,
         outputFileName
       );
-      UndoMove(moves.items[i]);
+      UndoMove(board, makedMoves, moves.items[i]);
     end;
     moves.length := firstPossibleMoveIndex - 1;
 
