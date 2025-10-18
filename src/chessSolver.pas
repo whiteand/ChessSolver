@@ -879,12 +879,12 @@ begin
    and ((board[i,j] = EMPTY_CELL) or (ColorOf(board[i,j]) <> myColor))
 end;
 
-function HasPieceOfColor(var board:TBoard; i, j: shortint; color: PlayerColor): boolean;
+function HasPieceOfColor(var board: TBoard; i, j: shortint; color: PlayerColor): boolean;
 begin
   HasPieceOfColor := (board[i,j] <> EMPTY_CELL) and (ColorOf(board[i,j]) = color);
 end;
 
-procedure AddAllPossiblePawnMoves(var board: TBoard; i, j: shortint);
+procedure AddAllPossiblePawnMoves(var board: TBoard; var makedMoves: TMoves; var moves: TMoves; i, j: shortint);
 var color: PlayerColor;
     curfig: shortint;
     currentPawnMoveDirection: shortint;
@@ -949,7 +949,7 @@ begin
   end;
 end;
 
-procedure AddAllPossibleKnightMoves(var board: TBoard; i, j: shortint);
+procedure AddAllPossibleKnightMoves(var board: TBoard; var makedMoves: TMoves; var moves: TMoves; i, j: shortint);
 var curfig: shortint;
     color: PlayerColor;
 begin
@@ -994,7 +994,7 @@ begin
   end;
 end;
 
-procedure AddAllPossibleBishopMoves(var board: TBoard; i, j: shortint);
+procedure AddAllPossibleBishopMoves(var board: TBoard; var makedMoves: TMoves; var moves: TMoves; i, j: shortint);
 begin
   AddMovesDist(board, makedMoves, moves, i,j,-1,-1);
   AddMovesDist(board, makedMoves, moves, i,j,-1, 1);
@@ -1002,14 +1002,14 @@ begin
   AddMovesDist(board, makedMoves, moves, i,j, 1, 1);
 end;
 
-procedure AddAllPossibleRookMoves(var board: TBoard; i, j: shortint);
+procedure AddAllPossibleRookMoves(var board: TBoard; var makedMoves: TMoves; var moves: TMoves; i, j: shortint);
 begin
   AddMovesDist(board, makedMoves, moves, i,j,-1, 0);
   AddMovesDist(board, makedMoves, moves, i,j, 0, 1);
   AddMovesDist(board, makedMoves, moves, i,j, 1, 0);
   AddMovesDist(board, makedMoves, moves, i,j, 0,-1);
 end;
-procedure AddAllPossibleQueenMoves(var board: TBoard; i, j: shortint);
+procedure AddAllPossibleQueenMoves(var board: TBoard; var makedMoves: TMoves; var moves: TMoves; i, j: shortint);
 begin
   AddMovesDist(board, makedMoves, moves, i,j,-1,-1);
   AddMovesDist(board, makedMoves, moves, i,j,-1, 1);
@@ -1020,7 +1020,7 @@ begin
   AddMovesDist(board, makedMoves, moves, i,j, 1, 0);
   AddMovesDist(board, makedMoves, moves, i,j, 0,-1);
 end;
-procedure AddAllPossibleKingMoves(var board: TBoard; i, j: shortint);
+procedure AddAllPossibleKingMoves(var board: TBoard; var makedMoves: TMoves; var moves: TMoves; i, j: shortint);
 begin
   assert(abs(board[i,j]) = WHITE_KING, 'invariant failed');
   AddMove(board, makedMoves, moves, CreateMove(i,j,i-1,j-1, board[i,j]));
@@ -1033,7 +1033,7 @@ begin
   AddMove(board, makedMoves, moves, CreateMove(i,j,i+1,j+1, board[i,j]));
 end;
 
-procedure AddAllPossibleMoves(color: PlayerColor);
+procedure AddAllPossibleMoves(var board: TBoard; var makedMoves: TMoves; var moves: TMoves; color: PlayerColor);
 var i,j: longint;
 begin
   for i:=1 to BOARD_SIZE do
@@ -1043,12 +1043,12 @@ begin
       if not HasPieceOfColor(board, i, j, color) then continue;
 
       case GetFigureFromValue(board[i, j]) of
-        Pawn: AddAllPossiblePawnMoves(board, i, j);
-        Knight: AddAllPossibleKnightMoves(board, i, j);
-        Bishop: AddAllPossibleBishopMoves(board, i, j);
-        Rook: AddAllPossibleRookMoves(board, i, j);
-        Queen: AddAllPossibleQueenMoves(board, i, j);
-        King: AddAllPossibleKingMoves(board, i, j);
+        Pawn: AddAllPossiblePawnMoves(board, makedMoves, moves, i, j);
+        Knight: AddAllPossibleKnightMoves(board, makedMoves, moves, i, j);
+        Bishop: AddAllPossibleBishopMoves(board, makedMoves, moves, i, j);
+        Rook: AddAllPossibleRookMoves(board, makedMoves, moves, i, j);
+        Queen: AddAllPossibleQueenMoves(board, makedMoves, moves, i, j);
+        King: AddAllPossibleKingMoves(board, makedMoves, moves, i, j);
       end;
     end;
   end;
@@ -1058,6 +1058,7 @@ end;
 procedure Solve(
   var board: TBoard;
   var makedMoves: TMoves;
+  var moves: TMoves;
   var lastSavedMoves: TMoves;
   color: PlayerColor;
   countOfMoves: longint;
@@ -1065,7 +1066,9 @@ procedure Solve(
   buffermax: longint;
   movesGroupSize: longint;
   showEnemyMoves: boolean;
-  outputFileName: string
+  outputFileName: string;
+  var cVariants: int64;
+  var maxCountOfPossibleMoves: int64
 );
 var firstPossibleMoveIndex: longint;
     lastPossibleMoveIndex: longint;
@@ -1096,7 +1099,7 @@ begin
   begin
     previousMoveWasCheckToWhites := checkWhite;
     previousMoveWasCheckToBlacks := checkBlack;
-    AddAllPossibleMoves(color);
+    AddAllPossibleMoves(board, makedMoves, moves, color);
     lastPossibleMoveIndex := moves.length-1;
     if (lastPossibleMoveIndex < firstPossibleMoveIndex) and (IsCheckTo(board, PlayerColorBlack)) then
     begin
@@ -1116,6 +1119,7 @@ begin
       Solve(
         board,
         makedMoves,
+        moves,
         lastSavedMoves,
         OppositeColor(color),
         countOfMoves -1,
@@ -1123,7 +1127,9 @@ begin
         buffermax,
         movesGroupSize,
         showEnemyMoves,
-        outputFileName
+        outputFileName,
+        cVariants,
+        maxCountOfPossibleMoves
       );
       UndoMove(board, makedMoves, moves.items[i]);
     end;
@@ -1142,6 +1148,7 @@ Begin
   Solve(
     board,
     makedMoves,
+    moves,
     lastSavedMoves,
     PlayerColorWhite,
     cmdArgs.Moves*2,
@@ -1149,7 +1156,9 @@ Begin
     cmdArgs.BufferSize,
     cmdArgs.MovesGroupSize,
     cmdArgs.ShowEnemyMoves,
-    cmdArgs.OutputFileName
+    cmdArgs.OutputFileName,
+    cVariants,
+    maxCountOfPossibleMoves
   );
   SaveBuf(
     buffer,
