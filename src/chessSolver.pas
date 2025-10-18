@@ -68,16 +68,16 @@ type TBoard = array [1..BOARD_SIZE, 1..BOARD_SIZE] of shortint;
 {$i ./vector.pas}
 {$macro off}
 
-var cmdArgs: TCmdArgs;
-    board: TBoard;
-    moves: TMoves;
-    previousMoveWasCheckToWhites, previousMoveWasCheckToBlacks: boolean;
-    makedMoves: TMoves;
-    cVariants: int64 = 0;
-    cSolving: int64 = 0;
-    maxcountofpossibleMoves: int64 = 0;
-    buffer: TStrings;
-    lastSavedMoves: TMoves;
+var globalCmdArgs: TCmdArgs;
+    globalBoard: TBoard;
+    globalMoves: TMoves;
+    globalPreviousMoveWasCheckToWhites, globalPreviousMoveWasCheckToBlacks: boolean;
+    globalMakedMoves: TMoves;
+    globalCVariants: int64 = 0;
+    globalCSolving: int64 = 0;
+    globalMaxCountOfPossibleMoves: int64 = 0;
+    globalBuffer: TStrings;
+    globalLastSavedMoves: TMoves;
 operator =(a,b:Move)z:boolean;
 begin
   Exit(
@@ -215,7 +215,7 @@ begin
               WriteLn('ERROR: Output file name should not be empty');
               Exit(false);
             end;
-            cmdArgs.OutputFileName := argument;
+            args.OutputFileName := argument;
             expectsOutputFileName := false;
             outputFileNameProvided := true;
         end
@@ -1067,7 +1067,10 @@ procedure Solve(
   movesGroupSize: longint;
   showEnemyMoves: boolean;
   outputFileName: string;
+  var previousMoveWasCheckToWhites: boolean;
+  var previousMoveWasCheckToBlacks: boolean;
   var cVariants: int64;
+  var cSolving: int64;
   var maxCountOfPossibleMoves: int64
 );
 var firstPossibleMoveIndex: longint;
@@ -1128,43 +1131,48 @@ begin
         movesGroupSize,
         showEnemyMoves,
         outputFileName,
+        previousMoveWasCheckToWhites,
+        previousMoveWasCheckToBlacks,
         cVariants,
+        cSolving,
         maxCountOfPossibleMoves
       );
       UndoMove(board, makedMoves, moves.items[i]);
     end;
     moves.length := firstPossibleMoveIndex - 1;
-
   end;
 end;
 
 Begin
-  Initialize(cmdArgs, board);
-  ShowChessBoard(board);
+  Initialize(globalCmdArgs, globalBoard);
+  ShowChessBoard(globalBoard);
   readkey;
   textcolor(7);
   textbackground(0);
   clrscr;
   Solve(
-    board,
-    makedMoves,
-    moves,
-    lastSavedMoves,
+    globalBoard,
+    globalMakedMoves,
+    globalMoves,
+    globalLastSavedMoves,
     PlayerColorWhite,
-    cmdArgs.Moves*2,
-    buffer,
-    cmdArgs.BufferSize,
-    cmdArgs.MovesGroupSize,
-    cmdArgs.ShowEnemyMoves,
-    cmdArgs.OutputFileName,
-    cVariants,
-    maxCountOfPossibleMoves
+    globalCmdArgs.Moves*2,
+    globalBuffer,
+    globalCmdArgs.BufferSize,
+    globalCmdArgs.MovesGroupSize,
+    globalCmdArgs.ShowEnemyMoves,
+    globalCmdArgs.OutputFileName,
+    globalPreviousMoveWasCheckToWhites,
+    globalPreviousMoveWasCheckToBlacks,
+    globalCVariants,
+    globalCSolving,
+    globalMaxCountOfPossibleMoves
   );
   SaveBuf(
-    buffer,
-    cmdArgs.OutputFileName
+    globalBuffer,
+    globalCmdArgs.OutputFileName
   );
-  WriteLn('Solved: ',cSolving);
-  WriteLn('Watched: ', cVariants);
+  WriteLn('Solved: ', globalCSolving);
+  WriteLn('Watched: ', globalCVariants);
   readkey;
 end.
