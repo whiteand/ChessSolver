@@ -655,23 +655,6 @@ begin
    
    Exit(false)
 end;
-procedure SaveBoard;
-var f: text;
-    i,j: longint;
-begin
-  Assign(f,'out.txt');
-  Append(f);
-  for i:=1 to BOARD_SIZE do
-  begin
-    for j:=1 to BOARD_SIZE do
-    begin
-      Write(f, board[i,j]:3);
-    end;
-    WriteLn(f);
-  end;
-  WriteLn(f);
-  Close(f);
-end;
 function FigureToStr(f: longint): string;
 var res: string;
 begin
