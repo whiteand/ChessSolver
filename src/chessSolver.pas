@@ -659,12 +659,12 @@ function FigureToStr(f: longint): string;
 var res: string;
 begin
   res:= ' ';
-  if (abs(f) = WHITE_PAWN) then res:= ' pawn';
-  if (abs(f) = WHITE_KNIGHT) then res:= ' knight';
-  if (abs(f) = WHITE_BISHOP) then res:= ' bishop';
-  if (abs(f) = WHITE_ROOK) then res:= ' rook';
-  if (abs(f) = WHITE_QUEEN) then res:= ' queen';
-  if (abs(f) = WHITE_KING) then res:= ' king';
+  if (abs(f) = WHITE_PAWN) then res := ' pawn';
+  if (abs(f) = WHITE_KNIGHT) then res := ' knight';
+  if (abs(f) = WHITE_BISHOP) then res := ' bishop';
+  if (abs(f) = WHITE_ROOK) then res := ' rook';
+  if (abs(f) = WHITE_QUEEN) then res := ' queen';
+  if (abs(f) = WHITE_KING) then res := ' king';
   if (f<0) then res[1] := 'b'
            else res[1] := 'w';
   FigureToStr:=res;
@@ -696,7 +696,9 @@ begin
     Close(f);
     buffer.length := 0
 end;
-procedure saveMoves(
+procedure SaveMoves(
+  var makedMoves: TMoves;
+  var lastSavedMoves: TMoves;
   outputFileName: string;
   var buffer: TStrings;
   buffermax: longint;
@@ -719,7 +721,7 @@ begin
   begin
     if (i mod 2 = 0) or showEnemyMoves then
     begin
-      s := s + MoveToSTr(makedmoves.items[i])+chr(9)
+      s := s + MoveToStr(makedmoves.items[i])+chr(9)
     end;
   end;
   TStringsPush(s, buffer);
@@ -1051,6 +1053,8 @@ end;
 //-----------------------------------------------------------------------------
 procedure Solve(
   var board: TBoard;
+  var makedMoves: TMoves;
+  var lastSavedMoves: TMoves;
   color: PlayerColor;
   countOfMoves: longint;
   var buffer: TStrings;
@@ -1095,7 +1099,7 @@ begin
         Inc(cSolving);
         if (maxcountOfPossiblemoves < moves.length) then maxcountofPossibleMoves := moves.length;
         WriteLn('solved: ', cSolving, ' Solve: ', cVariants, '   max: ', maxcountofpossibleMoves);
-        SaveMoves(outputFileName, buffer, buffermax, showEnemyMoves, movesGroupSize);
+        SaveMoves(makedMoves, lastSavedMoves, outputFileName, buffer, buffermax, showEnemyMoves, movesGroupSize);
 
     end else
     for i := lastPossibleMoveIndex downto firstPossibleMoveIndex do
@@ -1107,6 +1111,8 @@ begin
       {$ENDIF}
       Solve(
         board,
+        makedMoves,
+        lastSavedMoves,
         OppositeColor(color),
         countOfMoves -1,
         buffer,
@@ -1131,6 +1137,8 @@ Begin
   clrscr;
   Solve(
     board,
+    makedMoves,
+    lastSavedMoves,
     PlayerColorWhite,
     cmdArgs.Moves*2,
     buffer,
