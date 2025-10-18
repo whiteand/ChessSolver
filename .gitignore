@@ -10,3 +10,4 @@ chessSolver
 moves_*.txt
 target/
 LINKS.md
+.vscode/GTEMP.pas

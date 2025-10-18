@@ -757,7 +757,7 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure DoMove(var m: Move);
+procedure DoMove(var board: TBoard; var makedMoves: TMoves; var m: Move);
 begin
   with m do
   begin
@@ -805,14 +805,14 @@ end;
 // if the move is valid (figure moves into empty cell or attacks an enemy)
 // AND king is not under attack after the move
 //-----------------------------------------------------------------------------
-procedure AddMove(var board: TBoard; m: Move);
+procedure AddMove(var board: TBoard;var makedMoves: TMoves; m: Move);
 var isCheckAfterMove: boolean;
     isMoveToEmptyCell: boolean;
     isOppositeColorAttacked: boolean;
 begin
   if (m.iEnd>=1) and (m.iEnd<=8) and (m.jEnd>=1) and (m.jEnd<=8) then
   begin
-    DoMove(m);
+    DoMove(board, makedMoves, m);
     
     isCheckAfterMove := IsCheckTo(board, ColorOf(m.figureStart));
     isMoveToEmptyCell := m.figureEnd = EMPTY_CELL;
@@ -840,7 +840,7 @@ begin
     while (current*currentFigure <= 0) and (i<=BOARD_SIZE) and (i>=1) and (j<=BOARD_SIZE) and (j>=1) do
     begin
       curmov := CreateMove(i0,j0,i,j, currentFigure);
-      AddMove(board, curmov);
+      AddMove(board, makedMoves, curmov);
       if (current*currentFigure < 0) then break;
       i := i + dn;
       j := j + dm;
@@ -905,7 +905,7 @@ begin
       board
   ) then
   begin
-      AddMove(board, CreateMove(
+      AddMove(board, makedMoves,  CreateMove(
         i,j,
         i + currentPawnMoveDirection, j - 1,
         curfig
@@ -917,7 +917,7 @@ begin
       board
   ) then
   begin
-      AddMove(board, CreateMove(
+      AddMove(board, makedMoves, CreateMove(
         i,j,
         i + currentPawnMoveDirection, j + 1,
         curfig
@@ -925,14 +925,14 @@ begin
   end;
   if board[i + currentPawnMoveDirection, j] = EMPTY_CELL then
   begin
-    AddMove(board, CreateMove(i,j,i+currentPawnMoveDirection,j, curfig));
+    AddMove(board, makedMoves, CreateMove(i,j,i+currentPawnMoveDirection,j, curfig));
   end;
   if (color = PlayerColorWhite) and (i = BOARD_SIZE - 1) then
   begin
     if (GetFigureOn(board, i + WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
       and (GetFigureOn(board, i + 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
     begin
-        AddMove(board, CreateMove(i,j,i + 2 * WHITE_PAWN_MOVE_DIRECTION, j, curfig));
+        AddMove(board, makedMoves, CreateMove(i,j,i + 2 * WHITE_PAWN_MOVE_DIRECTION, j, curfig));
     end;
   end;
   if (color = PlayerColorBlack) and (i = 2) then
@@ -940,7 +940,7 @@ begin
     if (GetFigureOn(board, i - WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL)
       and (GetFigureOn(board, i - 2 * WHITE_PAWN_MOVE_DIRECTION, j) = EMPTY_CELL) then
     begin
-        AddMove(board, CreateMove(i,j,i - 2 * WHITE_PAWN_MOVE_DIRECTION,j, curfig));
+        AddMove(board, makedMoves, CreateMove(i,j,i - 2 * WHITE_PAWN_MOVE_DIRECTION,j, curfig));
     end;
   end;
 end;
@@ -957,36 +957,36 @@ begin
   // Rewrite with a loop.
   if HasEnemyOrEmpty(color, i-2,j-1, board) then
   begin
-    AddMove(board, CreateMove(i,j,i-2,j-1, curfig));
+    AddMove(board, makedMoves, CreateMove(i,j,i-2,j-1, curfig));
   end;
   if HasEnemyOrEmpty(color, i-2,j+1, board) then
   begin
-    AddMove(board, CreateMove(i,j,i-2,j+1, curfig));
+    AddMove(board, makedMoves, CreateMove(i,j,i-2,j+1, curfig));
   end;
   if HasEnemyOrEmpty(color, i+2,j-1, board) then
   begin
-    AddMove(board, CreateMove(i,j,i+2,j-1, curfig));
+    AddMove(board, makedMoves, CreateMove(i,j,i+2,j-1, curfig));
   end;
   if HasEnemyOrEmpty(color,i+2,j+1,board) then
   begin
-    AddMove(board, CreateMove(i,j,i+2,j+1, curfig));
+    AddMove(board, makedMoves, CreateMove(i,j,i+2,j+1, curfig));
   end;
 
   if (HasEnemyOrEmpty(color,i-1,j-2,board)) then
   begin
-    AddMove(board, CreateMove(i,j,i-1,j-2, curfig));
+    AddMove(board, makedMoves, CreateMove(i,j,i-1,j-2, curfig));
   end;
   if HasEnemyOrEmpty(color, i-1, j+2, board) then
   begin
-    AddMove(board, CreateMove(i,j,i-1,j+2, curfig));
+    AddMove(board, makedMoves, CreateMove(i,j,i-1,j+2, curfig));
   end;
   if HasEnemyOrEmpty(color, i+1,j-2, board) then
   begin
-    AddMove(board, CreateMove(i,j,i+1,j-2, curfig));
+    AddMove(board, makedMoves, CreateMove(i,j,i+1,j-2, curfig));
   end;
   if HasEnemyOrEmpty(color, i+1,j+2, board) then
   begin
-    AddMove(board, CreateMove(i,j,i+1,j+2, curfig));
+    AddMove(board, makedMoves, CreateMove(i,j,i+1,j+2, curfig));
   end;
 end;
 
@@ -1019,14 +1019,14 @@ end;
 procedure AddAllPossibleKingMoves(var board: TBoard; i, j: shortint);
 begin
   assert(abs(board[i,j]) = WHITE_KING, 'invariant failed');
-  AddMove(board, CreateMove(i,j,i-1,j-1, board[i,j]));
-  AddMove(board, CreateMove(i,j,i-1,j,   board[i,j]));
-  AddMove(board, CreateMove(i,j,i-1,j+1, board[i,j]));
-  AddMove(board, CreateMove(i,j,i,  j-1, board[i,j]));
-  AddMove(board, CreateMove(i,j,i,  j+1, board[i,j]));
-  AddMove(board, CreateMove(i,j,i+1,j-1, board[i,j]));
-  AddMove(board, CreateMove(i,j,i+1,j,   board[i,j]));
-  AddMove(board, CreateMove(i,j,i+1,j+1, board[i,j]));
+  AddMove(board, makedMoves, CreateMove(i,j,i-1,j-1, board[i,j]));
+  AddMove(board, makedMoves, CreateMove(i,j,i-1,j,   board[i,j]));
+  AddMove(board, makedMoves, CreateMove(i,j,i-1,j+1, board[i,j]));
+  AddMove(board, makedMoves, CreateMove(i,j,i,  j-1, board[i,j]));
+  AddMove(board, makedMoves, CreateMove(i,j,i,  j+1, board[i,j]));
+  AddMove(board, makedMoves, CreateMove(i,j,i+1,j-1, board[i,j]));
+  AddMove(board, makedMoves, CreateMove(i,j,i+1,j,   board[i,j]));
+  AddMove(board, makedMoves, CreateMove(i,j,i+1,j+1, board[i,j]));
 end;
 
 procedure AddAllPossibleMoves(color: PlayerColor);
@@ -1104,7 +1104,7 @@ begin
     end else
     for i := lastPossibleMoveIndex downto firstPossibleMoveIndex do
     begin
-      DoMove(moves.items[i]);
+      DoMove(board, makedMoves, moves.items[i]);
       {$IFDEF SHOULD_LOG}
       WriteLn;
       ShowChessBoard(board);
