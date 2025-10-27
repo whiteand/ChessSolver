@@ -588,6 +588,23 @@ begin
     or (SearchTo(board, i0,j0,1,-1) = GetFigureValue(Queen, attackerColor))
     or (SearchTo(board, i0,j0,0,-1) = GetFigureValue(Queen, attackerColor)))
 end;
+function IsUnderAttackByKing(
+  var board: TBoard;
+  attackerColor: PlayerColor;
+  i0, j0: longint
+): boolean;
+begin
+  Exit(
+     (GetFigureOn(board, i0-1,j0-1) = GetFigureValue(King, attackerColor))
+  or (GetFigureOn(board, i0-1,j0) = GetFigureValue(King, attackerColor))
+  or (GetFigureOn(board, i0-1,j0+1) = GetFigureValue(King, attackerColor))
+  or (GetFigureOn(board, i0,j0-1) = GetFigureValue(King, attackerColor))
+  or (GetFigureOn(board, i0,j0+1) = GetFigureValue(King, attackerColor))
+  or (GetFigureOn(board, i0+1,j0-1) = GetFigureValue(King, attackerColor))
+  or (GetFigureOn(board, i0+1,j0) = GetFigureValue(King, attackerColor))
+  or (GetFigureOn(board, i0+1,j0+1) = GetFigureValue(King, attackerColor))
+  )
+end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 function IsUnderAttackByFigure(
@@ -632,14 +649,7 @@ begin
   if (abs(figure) = WHITE_KING) then
   begin
   	Exit(
-      (GetFigureOn(board, i0-1,j0-1) = figure) or
-  	    (GetFigureOn(board, i0-1,j0) = figure) or
-  	    (GetFigureOn(board, i0-1,j0+1) = figure) or
-  	    (GetFigureOn(board, i0,j0-1) = figure) or
-  	    (GetFigureOn(board, i0,j0+1) = figure) or
-  	    (GetFigureOn(board, i0+1,j0-1) = figure) or
-  	    (GetFigureOn(board, i0+1,j0) = figure) or
-  	    (GetFigureOn(board, i0+1,j0+1) = figure)
+      IsUnderAttackByKing(board, attackerColor, i0, j0)
     )
   end;
   assert(false, 'Unexpected figure')
