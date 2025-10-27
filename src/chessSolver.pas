@@ -573,6 +573,21 @@ begin
       or (SearchTo(board, i0,j0,0,-1) = GetFigureValue(Rook, attackerColor))
       or (SearchTo(board, i0,j0,0,1) = GetFigureValue(Rook, attackerColor)))
 end;
+function IsUnderAttackByQueen(
+  var board: TBoard;
+  attackerColor: PlayerColor;
+  i0, j0: longint
+): boolean;
+begin
+  Exit( (SearchTo(board, i0,j0,-1,-1) = GetFigureValue(Queen, attackerColor))
+    or (SearchTo(board, i0,j0,-1,0) = GetFigureValue(Queen, attackerColor))
+    or (SearchTo(board, i0,j0,-1,1) = GetFigureValue(Queen, attackerColor))
+    or (SearchTo(board, i0,j0,0,1) = GetFigureValue(Queen, attackerColor))
+    or (SearchTo(board, i0,j0,1,1) = GetFigureValue(Queen, attackerColor))
+    or (SearchTo(board, i0,j0,1,0) = GetFigureValue(Queen, attackerColor))
+    or (SearchTo(board, i0,j0,1,-1) = GetFigureValue(Queen, attackerColor))
+    or (SearchTo(board, i0,j0,0,-1) = GetFigureValue(Queen, attackerColor)))
+end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 function IsUnderAttackByFigure(
@@ -611,14 +626,7 @@ begin
   if (abs(figure) = WHITE_QUEEN) then
   begin
   	Exit(
-      (SearchTo(board, i0,j0,-1,-1) = figure)
-    or (SearchTo(board, i0,j0,-1,0) = figure)
-    or (SearchTo(board, i0,j0,-1,1) = figure)
-    or (SearchTo(board, i0,j0,0,1) = figure)
-    or (SearchTo(board, i0,j0,1,1) = figure)
-    or (SearchTo(board, i0,j0,1,0) = figure)
-    or (SearchTo(board, i0,j0,1,-1) = figure)
-    or (SearchTo(board, i0,j0,0,-1) = figure)
+     IsUnderAttackByQueen(board, attackerColor, i0, j0)
     );
   end;
   if (abs(figure) = WHITE_KING) then
