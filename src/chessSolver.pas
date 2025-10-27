@@ -102,7 +102,7 @@ begin
 end;
 
 procedure ShowChessBoard(
-  var board: TBoard
+  constref board: TBoard
 );
 const COLOR_WHITE     = 15;
       COLOR_BLACK     = 0;
@@ -326,7 +326,7 @@ end;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-procedure FindKing(var board: TBoard; color: PlayerColor; var i0,j0: longint);
+procedure FindKing(constref board: TBoard; color: PlayerColor; var i0,j0: longint);
 var i,j: longint;
 begin
   for i:=1 to BOARD_SIZE do
@@ -504,7 +504,7 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function SearchTo(var board: TBoard; i0,j0,dn,dm: longint): longint;
+function SearchTo(constref board: TBoard; i0,j0,dn,dm: shortint): shortint;
 var i,j: longint;
     current: longint;
 begin
@@ -521,7 +521,7 @@ begin
   Exit(0);
 end;
 function IsUnderAttackByPawn(
-  var board: TBoard;
+  constref board: TBoard;
   attackerColor: PlayerColor;
   i0, j0: longint
 ): boolean;
@@ -537,7 +537,7 @@ begin
     );
 end;
 function IsUnderAttackByKnight(
-  var board: TBoard;
+  constref board: TBoard;
   attackerColor: PlayerColor;
   i0, j0: longint
 ): boolean;
@@ -552,7 +552,7 @@ begin
   		(HasFigureOn(board, Knight, attackerColor, i0+1,j0+2)))
 end;
 function IsUnderAttackByBishop(
-  var board: TBoard;
+  constref board: TBoard;
   attackerColor: PlayerColor;
   i0, j0: longint
 ): boolean;
@@ -563,7 +563,7 @@ begin
     or (SearchTo(board, i0,j0,1,1) = GetFigureValue(Bishop, attackerColor)))
 end;
 function IsUnderAttackByRook(
-  var board: TBoard;
+  constref board: TBoard;
   attackerColor: PlayerColor;
   i0, j0: longint
 ): boolean;
@@ -574,7 +574,7 @@ begin
       or (SearchTo(board, i0,j0,0,1) = GetFigureValue(Rook, attackerColor)))
 end;
 function IsUnderAttackByQueen(
-  var board: TBoard;
+  constref board: TBoard;
   attackerColor: PlayerColor;
   i0, j0: longint
 ): boolean;
@@ -589,7 +589,7 @@ begin
     or (SearchTo(board, i0,j0,0,-1) = GetFigureValue(Queen, attackerColor)))
 end;
 function IsUnderAttackByKing(
-  var board: TBoard;
+  constref board: TBoard;
   attackerColor: PlayerColor;
   i0, j0: longint
 ): boolean;
@@ -608,14 +608,12 @@ end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 function IsUnderAttackByFigure(
-  var board: TBoard;
+  constref board: TBoard;
   attackerFigure: ChessFigure;
   attackerColor: PlayerColor;
   i0, j0: longint
 ): boolean;
-var figure: shortint;
 begin
-  figure := GetFigureValue(attackerFigure, attackerColor);
   case attackerFigure of
     Pawn: Exit(IsUnderAttackByPawn(board, attackerColor, i0, j0));
     Knight: Exit(IsUnderAttackByKnight(board, attackerColor, i0, j0));
@@ -628,16 +626,14 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function IsUnderAttackBy(var board: TBoard; colorOfAttacker: PlayerColor; i0, j0: longint): boolean;
+function IsUnderAttackBy(constref board: TBoard; colorOfAttacker: PlayerColor; i0, j0: longint): boolean;
 begin
-   if IsUnderAttackByFigure(board, Pawn, colorOfAttacker, i0, j0) then Exit(true);
-   if IsUnderAttackByFigure(board, Knight, colorOfAttacker, i0, j0) then Exit(true);
-   if IsUnderAttackByFigure(board, Bishop, colorOfAttacker, i0, j0) then Exit(true);
-   if IsUnderAttackByFigure(board, Rook, colorOfAttacker, i0, j0) then Exit(true);
-   if IsUnderAttackByFigure(board, Queen, colorOfAttacker, i0, j0) then Exit(true);
-   if IsUnderAttackByFigure(board, King, colorOfAttacker, i0, j0) then Exit(true);
-   
-   Exit(false)
+   Exit(IsUnderAttackByFigure(board, Pawn, colorOfAttacker, i0, j0) 
+   or IsUnderAttackByFigure(board, Knight, colorOfAttacker, i0, j0) 
+   or IsUnderAttackByFigure(board, Bishop, colorOfAttacker, i0, j0) 
+   or IsUnderAttackByFigure(board, Rook, colorOfAttacker, i0, j0) 
+   or IsUnderAttackByFigure(board, Queen, colorOfAttacker, i0, j0) 
+   or IsUnderAttackByFigure(board, King, colorOfAttacker, i0, j0)); 
 end;
 function FigureToStr(f: longint): string;
 var res: string;
@@ -659,7 +655,7 @@ begin
   str(i, res);
   Exit(chr(ord('a') + j - 1) + res)
 end;
-function MoveToStr(m:Move): string;
+function MoveToStr(m: Move): string;
 begin
   Exit(
     FigureToStr(m.figureStart) + ' '
@@ -681,7 +677,7 @@ begin
     buffer.length := 0
 end;
 procedure SaveMoves(
-  var makedMoves: TMoves;
+  constref makedMoves: TMoves;
   var lastSavedMoves: TMoves;
   outputFileName: string;
   var buffer: TStrings;
@@ -774,7 +770,7 @@ begin
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-function IsCheckTo(var board: TBoard; color: PlayerColor):boolean; //TOWRITE
+function IsCheckTo(constref board: TBoard; color: PlayerColor): boolean;
 var res: boolean;
     i,j: longint;
 begin
@@ -794,20 +790,20 @@ var isCheckAfterMove: boolean;
     isMoveToEmptyCell: boolean;
     isOppositeColorAttacked: boolean;
 begin
-  if (m.iEnd>=1) and (m.iEnd<=8) and (m.jEnd>=1) and (m.jEnd<=8) then
-  begin
-    DoMove(board, makedMoves, m);
-    
-    isCheckAfterMove := IsCheckTo(board, ColorOf(m.figureStart));
-    isMoveToEmptyCell := m.figureEnd = EMPTY_CELL;
-    isOppositeColorAttacked := (not isMoveToEmptyCell) and (ColorOf(m.figurestart)<>ColorOf(m.figureEnd)); 
+  if (m.iEnd<1) or (m.iEnd>BOARD_SIZE) or (m.jEnd<1) or (m.jEnd>BOARD_SIZE) then Exit();
+  
+  DoMove(board, makedMoves, m);
+  
+  isCheckAfterMove := IsCheckTo(board, ColorOf(m.figureStart));
+  isMoveToEmptyCell := m.figureEnd = EMPTY_CELL;
+  isOppositeColorAttacked := (not isMoveToEmptyCell) and (ColorOf(m.figurestart)<>ColorOf(m.figureEnd)); 
 
-    if (not isCheckAfterMove) and (isMoveToEmptyCell or isOppositeColorAttacked) then
-    begin
-      TMovesPush(m, moves);
-    end;
-    UndoMove(board, makedMoves, m);
+  if (not isCheckAfterMove) and (isMoveToEmptyCell or isOppositeColorAttacked) then
+  begin
+    TMovesPush(m, moves);
   end;
+
+  UndoMove(board, makedMoves, m);
 end;
 procedure AddMovesDist(
   var board: TBoard;
@@ -838,9 +834,9 @@ begin
   end;
 end;
 function HasEnemy(
+  constref board: TBoard;
   myColor: PlayerColor;
-  i, j: shortint;
-  var board: TBoard
+  i, j: shortint
 ): boolean;
 begin
  HasEnemy := (i >= 1)
@@ -851,9 +847,9 @@ begin
    and (ColorOf(board[i,j]) <> myColor)
 end;
 function HasEnemyOrEmpty(
+  constref board: TBoard;
   myColor: PlayerColor;
-  i, j: shortint;
-  var board: TBoard
+  i, j: shortint
 ): boolean;
 begin
  HasEnemyOrEmpty := (i >= 1)
@@ -863,7 +859,7 @@ begin
    and ((board[i,j] = EMPTY_CELL) or (ColorOf(board[i,j]) <> myColor))
 end;
 
-function HasPieceOfColor(var board: TBoard; i, j: shortint; color: PlayerColor): boolean;
+function HasPieceOfColor(constref board: TBoard; i, j: shortint; color: PlayerColor): boolean;
 begin
   HasPieceOfColor := (board[i,j] <> EMPTY_CELL) and (ColorOf(board[i,j]) = color);
 end;
@@ -888,9 +884,9 @@ begin
   end;
 
   if HasEnemy(
+      board,
       color,
-      i + currentPawnMoveDirection, j - 1,
-      board
+      i + currentPawnMoveDirection, j - 1
   ) then
   begin
       AddMove(board, makedMoves, moves, CreateMove(
@@ -900,9 +896,9 @@ begin
       ));
   end;
   if HasEnemy(
+      board,
       color,
-      i + currentPawnMoveDirection, j + 1,
-      board
+      i + currentPawnMoveDirection, j + 1
   ) then
   begin
       AddMove(board, makedMoves, moves, CreateMove(
@@ -943,36 +939,36 @@ begin
   assert(abs(curfig) = WHITE_KNIGHT, 'invariant broken');
   
   // Rewrite with a loop.
-  if HasEnemyOrEmpty(color, i-2,j-1, board) then
+  if HasEnemyOrEmpty(board, color, i-2,j-1) then
   begin
     AddMove(board, makedMoves, moves, CreateMove(i,j,i-2,j-1, curfig));
   end;
-  if HasEnemyOrEmpty(color, i-2,j+1, board) then
+  if HasEnemyOrEmpty(board, color, i-2,j+1) then
   begin
     AddMove(board, makedMoves, moves, CreateMove(i,j,i-2,j+1, curfig));
   end;
-  if HasEnemyOrEmpty(color, i+2,j-1, board) then
+  if HasEnemyOrEmpty(board, color, i+2,j-1) then
   begin
     AddMove(board, makedMoves, moves, CreateMove(i,j,i+2,j-1, curfig));
   end;
-  if HasEnemyOrEmpty(color,i+2,j+1,board) then
+  if HasEnemyOrEmpty(board, color,i+2,j+1) then
   begin
     AddMove(board, makedMoves, moves, CreateMove(i,j,i+2,j+1, curfig));
   end;
 
-  if (HasEnemyOrEmpty(color,i-1,j-2,board)) then
+  if (HasEnemyOrEmpty(board, color,i-1,j-2)) then
   begin
     AddMove(board, makedMoves, moves, CreateMove(i,j,i-1,j-2, curfig));
   end;
-  if HasEnemyOrEmpty(color, i-1, j+2, board) then
+  if HasEnemyOrEmpty(board, color, i-1, j+2) then
   begin
     AddMove(board, makedMoves, moves, CreateMove(i,j,i-1,j+2, curfig));
   end;
-  if HasEnemyOrEmpty(color, i+1,j-2, board) then
+  if HasEnemyOrEmpty(board, color, i+1,j-2) then
   begin
     AddMove(board, makedMoves, moves, CreateMove(i,j,i+1,j-2, curfig));
   end;
-  if HasEnemyOrEmpty(color, i+1,j+2, board) then
+  if HasEnemyOrEmpty(board, color, i+1,j+2) then
   begin
     AddMove(board, makedMoves, moves, CreateMove(i,j,i+1,j+2, curfig));
   end;
