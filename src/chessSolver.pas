@@ -616,41 +616,13 @@ function IsUnderAttackByFigure(
 var figure: shortint;
 begin
   figure := GetFigureValue(attackerFigure, attackerColor);
-  // TODO: Rewrite this logic to not use abs(figure)
-  if (abs(figure) = WHITE_PAWN) then
-  begin
-    Exit(IsUnderAttackByPawn(board, attackerColor, i0, j0));
-  end;
-  if (abs(figure) = WHITE_KNIGHT) then
-  begin
-    Exit(
-     IsUnderAttackByKnight(board, attackerColor, i0, j0)
-    );
-  end;
-  if (abs(figure) = WHITE_BISHOP) then
-  begin
-    Exit(
-       IsUnderAttackByBishop(board, attackerColor, i0, j0)
-    );
-  end;
-  if (abs(figure) = WHITE_ROOK) then
-  begin
-  	//Search
-    Exit(
-      IsUnderAttackByRook(board, attackerColor, i0, j0)
-    );
-  end;
-  if (abs(figure) = WHITE_QUEEN) then
-  begin
-  	Exit(
-     IsUnderAttackByQueen(board, attackerColor, i0, j0)
-    );
-  end;
-  if (abs(figure) = WHITE_KING) then
-  begin
-  	Exit(
-      IsUnderAttackByKing(board, attackerColor, i0, j0)
-    )
+  case attackerFigure of
+    Pawn: Exit(IsUnderAttackByPawn(board, attackerColor, i0, j0));
+    Knight: Exit(IsUnderAttackByKnight(board, attackerColor, i0, j0));
+    Bishop: Exit(IsUnderAttackByBishop(board, attackerColor, i0, j0));
+    Rook: Exit(IsUnderAttackByRook(board, attackerColor, i0, j0));
+    Queen: Exit(IsUnderAttackByQueen(board, attackerColor, i0, j0));
+    King: Exit(IsUnderAttackByKing(board, attackerColor, i0, j0));
   end;
   assert(false, 'Unexpected figure')
 end;
