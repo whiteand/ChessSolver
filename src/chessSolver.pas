@@ -519,8 +519,7 @@ function IsUnderAttackByFigure(
   attackerColor: PlayerColor;
   i0, j0: longint
 ): boolean;
-var res: boolean;
-    figure: shortint;
+var figure: shortint;
 begin
   res := false;
   figure := GetFigureValue(attackerFigure, attackerColor);
@@ -531,116 +530,76 @@ begin
     begin
     	if (GetFigureOn(board, i0+1,j0+1) = figure) or (GetFigureOn(board, i0+1,j0-1) = figure) then
     	begin
-    		res := true;
+        Exit(true);
     	end;
     end else
     begin
     	if (GetFigureOn(board, i0-1,j0+1) = figure) or (GetFigureOn(board, i0-1,j0-1) = figure) then
     	begin
-    		res := true;
+        Exit(true); 
     	end;
     end;
-  end else
+    Exit(false);
+  end;
   if (abs(figure) = WHITE_KNIGHT) then
   begin
-  	if ((GetFigureOn(board, i0-2,j0-1) = figure) or
-                (GetFigureOn(board, i0-2,j0+1) = figure) or
+    Exit(
+      (GetFigureOn(board, i0-2,j0-1) = figure) or
+      (GetFigureOn(board, i0-2,j0+1) = figure) or
   		(GetFigureOn(board, i0+2,j0-1) = figure) or
   		(GetFigureOn(board, i0+2,j0+1) = figure) or
   		(GetFigureOn(board, i0-1,j0-2) = figure) or
   		(GetFigureOn(board, i0-1,j0+2) = figure) or
   		(GetFigureOn(board, i0+1,j0-2) = figure) or
-  		(GetFigureOn(board, i0+1,j0+2) = figure)) then
-  	begin
-  		res := true;
-  	end
-  end else
+  		(GetFigureOn(board, i0+1,j0+2) = figure)
+    );
+  end;
   if (abs(figure) = WHITE_BISHOP) then
   begin
-  	if (SearchTo(board, i0,j0,-1,-1) = figure) then
-  	begin
-  		//To The left top
-  		res := true;
-  	end
-  	else if (SearchTo(board, i0,j0,-1,1) = figure) then
-  	begin
-  		//To The right Top
-  		res := true;
-  	end
-	else if (SearchTo(board, i0,j0,1,-1) = figure) then
-  	begin
-  		//To the left bottom
-  		res := true;
-  	end
-  	else if (SearchTo(board, i0,j0,1,1) = figure) then
-  	begin
-	  	//to the right bottom
-  		res := true;
-  	end;
-
-  end else
+    Exit(
+       (SearchTo(board, i0,j0,-1,-1) = figure)
+    or (SearchTo(board, i0,j0,-1,1) = figure)
+    or (SearchTo(board, i0,j0,1,-1) = figure)
+    or (SearchTo(board, i0,j0,1,1) = figure)
+    );
+  end;
   if (abs(figure) = WHITE_ROOK) then
   begin
   	//Search
-  	if (SearchTo(board, i0,j0,-1,0) = figure) then
-  	begin
-  		res := true;
-  	end else if (SearchTo(board, i0,j0,1,0) = figure) then
-  	begin
-  		res := true;
-  	end else if (SearchTo(board, i0,j0,0,-1) = figure) then
-  	begin
-  		res := true;
-  	end else if (SearchTo(board, i0,j0,0,1) = figure) then
-  	begin
-  		res := true;
-  	end;
-
-  end else
+    Exit(
+      (SearchTo(board, i0,j0,-1,0) = figure)
+      or (SearchTo(board, i0,j0,1,0) = figure)
+      or (SearchTo(board, i0,j0,0,-1) = figure)
+      or (SearchTo(board, i0,j0,0,1) = figure)
+    );
+  end;
   if (abs(figure) = WHITE_QUEEN) then
   begin
-  	//Search
-  	if (SearchTo(board, i0,j0,-1,-1) = figure) then
-  	begin
-  		res := true;
-  	end else if (SearchTo(board, i0,j0,-1,0) = figure) then
-  	begin
-  		res := true;
-  	end else if (SearchTo(board, i0,j0,-1,1) = figure) then
-  	begin
-  		res := true;
-  	end else if (SearchTo(board, i0,j0,0,1) = figure) then
-  	begin
-  		res := true;
-  	end else if (SearchTo(board, i0,j0,1,1) = figure) then
-  	begin
-  		res := true;
-  	end else if (SearchTo(board, i0,j0,1,0) = figure) then
-  	begin
-  		res := true;
-  	end else if (SearchTo(board, i0,j0,1,-1) = figure) then
-  	begin
-  		res := true;
-  	end else if (SearchTo(board, i0,j0,0,-1) = figure) then
-  	begin
-  		res := true;
-  	end;
-  end else
+  	Exit(
+      (SearchTo(board, i0,j0,-1,-1) = figure)
+    or (SearchTo(board, i0,j0,-1,0) = figure)
+    or (SearchTo(board, i0,j0,-1,1) = figure)
+    or (SearchTo(board, i0,j0,0,1) = figure)
+    or (SearchTo(board, i0,j0,1,1) = figure)
+    or (SearchTo(board, i0,j0,1,0) = figure)
+    or (SearchTo(board, i0,j0,1,-1) = figure)
+    or (SearchTo(board, i0,j0,0,-1) = figure)
+    );
+  end;
   if (abs(figure) = WHITE_KING) then
   begin
-  	if ((GetFigureOn(board, i0-1,j0-1) = figure) or
+  	Exit(
+      (GetFigureOn(board, i0-1,j0-1) = figure) or
   	    (GetFigureOn(board, i0-1,j0) = figure) or
   	    (GetFigureOn(board, i0-1,j0+1) = figure) or
   	    (GetFigureOn(board, i0,j0-1) = figure) or
   	    (GetFigureOn(board, i0,j0+1) = figure) or
   	    (GetFigureOn(board, i0+1,j0-1) = figure) or
   	    (GetFigureOn(board, i0+1,j0) = figure) or
-  	    (GetFigureOn(board, i0+1,j0+1) = figure)) then
-  	begin
-  		res := true;
-  	end
+  	    (GetFigureOn(board, i0+1,j0+1) = figure)
+    )
   end;
-  IsUnderAttackByFigure := res;
+  assert(false, 'Unexpected figure')
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
