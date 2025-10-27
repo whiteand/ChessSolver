@@ -551,6 +551,28 @@ begin
   		(HasFigureOn(board, Knight, attackerColor, i0+1,j0-2)) or
   		(HasFigureOn(board, Knight, attackerColor, i0+1,j0+2)))
 end;
+function IsUnderAttackByBishop(
+  var board: TBoard;
+  attackerColor: PlayerColor;
+  i0, j0: longint
+): boolean;
+begin
+  Exit((SearchTo(board, i0,j0,-1,-1) = GetFigureValue(Bishop, attackerColor))
+    or (SearchTo(board, i0,j0,-1,1) = GetFigureValue(Bishop, attackerColor))
+    or (SearchTo(board, i0,j0,1,-1) = GetFigureValue(Bishop, attackerColor))
+    or (SearchTo(board, i0,j0,1,1) = GetFigureValue(Bishop, attackerColor)))
+end;
+function IsUnderAttackByRook(
+  var board: TBoard;
+  attackerColor: PlayerColor;
+  i0, j0: longint
+): boolean;
+begin
+  Exit((SearchTo(board, i0,j0,-1,0) = GetFigureValue(Rook, attackerColor))
+      or (SearchTo(board, i0,j0,1,0) = GetFigureValue(Rook, attackerColor))
+      or (SearchTo(board, i0,j0,0,-1) = GetFigureValue(Rook, attackerColor))
+      or (SearchTo(board, i0,j0,0,1) = GetFigureValue(Rook, attackerColor)))
+end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 function IsUnderAttackByFigure(
@@ -576,20 +598,14 @@ begin
   if (abs(figure) = WHITE_BISHOP) then
   begin
     Exit(
-       (SearchTo(board, i0,j0,-1,-1) = figure)
-    or (SearchTo(board, i0,j0,-1,1) = figure)
-    or (SearchTo(board, i0,j0,1,-1) = figure)
-    or (SearchTo(board, i0,j0,1,1) = figure)
+       IsUnderAttackByBishop(board, attackerColor, i0, j0)
     );
   end;
   if (abs(figure) = WHITE_ROOK) then
   begin
   	//Search
     Exit(
-      (SearchTo(board, i0,j0,-1,0) = figure)
-      or (SearchTo(board, i0,j0,1,0) = figure)
-      or (SearchTo(board, i0,j0,0,-1) = figure)
-      or (SearchTo(board, i0,j0,0,1) = figure)
+      IsUnderAttackByRook(board, attackerColor, i0, j0)
     );
   end;
   if (abs(figure) = WHITE_QUEEN) then
