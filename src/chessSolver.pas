@@ -483,7 +483,7 @@ begin
   if f > 0 then Exit(PlayerColorWhite)
   else if f < 0 then Exit(PlayerColorBlack)
 end;
-function GetFigureOn(var board: TBoard; i,j: longint): longint;
+function GetFigureOn(constref board: TBoard; i,j: longint): longint;
 begin
   if (i>=1) and (i<=BOARD_SIZE) and (j>=1) and (j<=BOARD_SIZE) then
   begin
@@ -492,6 +492,15 @@ begin
   begin
     GetFigureOn := 0;
   end;
+end;
+function HasFigureOn(
+  constref board: TBoard;
+  figure: ChessFigure;
+  color: PlayerColor;
+  i,j: shortint
+): boolean;
+begin
+  Exit(GetFigureOn(board, i, j) = GetFigureValue(figure, color))
 end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -511,6 +520,37 @@ begin
   end;
   Exit(0);
 end;
+function IsUnderAttackByPawn(
+  var board: TBoard;
+  attackerColor: PlayerColor;
+  i0, j0: longint
+): boolean;
+begin
+  if (attackerColor = PlayerColorWhite) then 
+    Exit(
+      HasFigureOn(board, Pawn, PlayerColorWhite, i0+1,j0+1)
+   or HasFigureOn(board, Pawn, PlayerColorWhite, i0+1,j0-1))
+  else
+    Exit(
+      HasFigureOn(board, Pawn, PlayerColorBlack, i0-1,j0+1)
+   or HasFigureOn(board, Pawn, PlayerColorBlack, i0-1,j0-1)
+    );
+end;
+function IsUnderAttackByKnight(
+  var board: TBoard;
+  attackerColor: PlayerColor;
+  i0, j0: longint
+): boolean;
+begin
+  Exit((HasFigureOn(board, Knight, attackerColor, i0-2,j0-1)) or
+      (HasFigureOn(board, Knight, attackerColor, i0-2,j0+1)) or
+  		(HasFigureOn(board, Knight, attackerColor, i0+2,j0-1)) or
+  		(HasFigureOn(board, Knight, attackerColor, i0+2,j0+1)) or
+  		(HasFigureOn(board, Knight, attackerColor, i0-1,j0-2)) or
+  		(HasFigureOn(board, Knight, attackerColor, i0-1,j0+2)) or
+  		(HasFigureOn(board, Knight, attackerColor, i0+1,j0-2)) or
+  		(HasFigureOn(board, Knight, attackerColor, i0+1,j0+2)))
+end;
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 function IsUnderAttackByFigure(
@@ -521,37 +561,16 @@ function IsUnderAttackByFigure(
 ): boolean;
 var figure: shortint;
 begin
-  res := false;
   figure := GetFigureValue(attackerFigure, attackerColor);
   // TODO: Rewrite this logic to not use abs(figure)
   if (abs(figure) = WHITE_PAWN) then
   begin
-    if (figure*WHITE_PAWN_MOVE_DIRECTION > 0) then
-    begin
-    	if (GetFigureOn(board, i0+1,j0+1) = figure) or (GetFigureOn(board, i0+1,j0-1) = figure) then
-    	begin
-        Exit(true);
-    	end;
-    end else
-    begin
-    	if (GetFigureOn(board, i0-1,j0+1) = figure) or (GetFigureOn(board, i0-1,j0-1) = figure) then
-    	begin
-        Exit(true); 
-    	end;
-    end;
-    Exit(false);
+    Exit(IsUnderAttackByPawn(board, attackerColor, i0, j0));
   end;
   if (abs(figure) = WHITE_KNIGHT) then
   begin
     Exit(
-      (GetFigureOn(board, i0-2,j0-1) = figure) or
-      (GetFigureOn(board, i0-2,j0+1) = figure) or
-  		(GetFigureOn(board, i0+2,j0-1) = figure) or
-  		(GetFigureOn(board, i0+2,j0+1) = figure) or
-  		(GetFigureOn(board, i0-1,j0-2) = figure) or
-  		(GetFigureOn(board, i0-1,j0+2) = figure) or
-  		(GetFigureOn(board, i0+1,j0-2) = figure) or
-  		(GetFigureOn(board, i0+1,j0+2) = figure)
+     IsUnderAttackByKnight(board, attackerColor, i0, j0)
     );
   end;
   if (abs(figure) = WHITE_BISHOP) then
